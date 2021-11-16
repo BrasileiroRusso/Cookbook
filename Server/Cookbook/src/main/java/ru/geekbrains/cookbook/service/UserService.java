@@ -1,6 +1,6 @@
 package ru.geekbrains.cookbook.service;
 
-/*
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
@@ -51,4 +51,3 @@ public class UserService implements UserDetailsService {
         return user;
     }
 }
-*/

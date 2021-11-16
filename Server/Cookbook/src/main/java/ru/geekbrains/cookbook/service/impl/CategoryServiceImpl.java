@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.repository.CategoryRepository;
 import ru.geekbrains.cookbook.service.CategoryService;
@@ -23,14 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public Category getCategoryById(Long id)  {
-        Optional<Category> optionalCategory = categoryRepository.findById(id);
-        if(!optionalCategory.isPresent())
-            throw new CategoryNotFoundException(String.format("Category with ID=%d doesn't exist", id));
-        return optionalCategory.get();
+        return categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
     }
 
     @Override
+    @Transactional
     public Category saveCategory(Category category) {
         if(category.getId() != null){
             Optional<Category> optionalCategory = categoryRepository.findById(category.getId());
@@ -43,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public boolean removeCategory(Long id) {
         try{
             categoryRepository.deleteById(id);
