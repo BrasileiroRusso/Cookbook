@@ -1,10 +1,10 @@
-package ru.rumigor.cookbook.ui.main
+package ru.rumigor.cookbook.ui.recipeDetails
 
 import moxy.viewstate.strategy.alias.SingleState
 import ru.rumigor.cookbook.ui.RecipeViewModel
 import ru.rumigor.cookbook.ui.ScreenView
 
-interface MainView: ScreenView {
+interface RecipeDetailsView: ScreenView {
     @SingleState
-    fun showRecipes(recipes: List<RecipeViewModel>)
+    fun showRecipe(recipe: RecipeViewModel)
 }

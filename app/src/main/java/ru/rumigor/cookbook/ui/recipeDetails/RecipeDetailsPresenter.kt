@@ -1,43 +1,34 @@
-package ru.rumigor.cookbook.ui.main
+package ru.rumigor.cookbook.ui.recipeDetails
 
-import com.github.terrakok.cicerone.Router
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import moxy.MvpPresenter
 import ru.rumigor.cookbook.data.repository.RecipeRepository
 import ru.rumigor.cookbook.scheduler.Schedulers
 import ru.rumigor.cookbook.ui.RecipeViewModel
-import ru.rumigor.cookbook.ui.recipeDetails.RecipeDetailsScreen
 
-
-class MainPresenter (
+class RecipeDetailsPresenter (
+    private val recipeId: String,
     private val recipeRepository: RecipeRepository,
-    private val router: Router,
     private val schedulers: Schedulers
-        ): MvpPresenter<MainView>() {
-
+): MvpPresenter<RecipeDetailsView>() {
     private val disposables = CompositeDisposable()
 
     override fun onFirstViewAttach() {
         disposables +=
             recipeRepository
-                .getRecipes()
-                .map { recipes -> recipes.map(RecipeViewModel.Mapper::map) }
+                .getRecipe(recipeId)
+                .map(RecipeViewModel.Mapper::map)
                 .observeOn(schedulers.main())
                 .subscribeOn(schedulers.background())
                 .subscribe(
-                    viewState::showRecipes,
+                    viewState::showRecipe,
                     viewState::showError
                 )
+
     }
 
     override fun onDestroy() {
-        disposables.dispose()
+        disposables.clear()
     }
-
-    fun displayRecipe(recipeId: String){
-        router.navigateTo(RecipeDetailsScreen(recipeId))
-    }
-
-
 }

@@ -8,12 +8,13 @@ import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
 import ru.rumigor.cookbook.CookbookApp
+import ru.rumigor.cookbook.data.di.modules.CookBookModule
 import ru.rumigor.cookbook.scheduler.Schedulers
 import javax.inject.Singleton
 
 @Singleton
 @Component(
-    modules =[AndroidInjectionModule::class]
+    modules =[AndroidInjectionModule::class, CookBookModule::class]
 )
 interface CookbookApplicationComponent : AndroidInjector<CookbookApp> {
     @Component.Builder
