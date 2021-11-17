@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 @Component
 public class ImageService {
 
-    @Value("/data/image")
+    @Value("C:/Image")
     private String mainFolderPath;
 
     private ImageService() {}
@@ -21,9 +21,9 @@ public class ImageService {
             throw new IllegalArgumentException("Image file can not be null!");
         }
         String imageFolder = mainFolderPath + '/' + folder;
-        createDirectories(Paths.get(System.getProperty("user.dir"), imageFolder));
+        createDirectories(Paths.get(imageFolder));
         Path savePath = Paths.get(imageFolder, imageFile.getOriginalFilename());
-        saveFile(imageFile, Paths.get(System.getProperty("user.dir"), savePath.toString()));
+        saveFile(imageFile, Paths.get(savePath.toString()));
 
         return savePath;
     }
@@ -43,5 +43,4 @@ public class ImageService {
             throw new RuntimeException("Can't save file by path=" + path);
         }
     }
-
 }

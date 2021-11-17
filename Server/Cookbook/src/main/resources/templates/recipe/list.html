@@ -8,10 +8,10 @@
     <div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
 
-    <h1>Список рецептов</h1>
+    <h2>Наши рецепты</h2>
 
-    <div class="row row-cols-1 row-cols-md-4 g-4">
-        <div th:each="recipe : ${recipes}" class="card" style="width: 18rem;">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div th:each="recipe : ${recipes}" class="card" style="width: 20rem">
             <div th:text="${recipe.category.title}" class="card-header">Category</div>
             <img th:src="@{${recipe.imagePath}}" class="card-img-top" alt="plate image">
             <div class="card-body">

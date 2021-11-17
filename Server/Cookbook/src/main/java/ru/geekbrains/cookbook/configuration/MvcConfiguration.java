@@ -12,7 +12,8 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String dataResourceName = "data";
-        String dataPath = Paths.get(System.getProperty("user.dir"), dataResourceName).toFile().getAbsolutePath();
+        String dataFolder = "C:/Data";
+        String dataPath = Paths.get(dataFolder).toFile().getAbsolutePath();
 
         registry.addResourceHandler("/" + dataResourceName + "/**")
                 .addResourceLocations("file:/"+  dataPath + "/");
