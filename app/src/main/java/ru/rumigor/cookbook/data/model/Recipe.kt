@@ -7,10 +7,8 @@ import com.google.gson.annotations.SerializedName
 data class Recipe(
     @PrimaryKey
     @SerializedName("id")
-    val recipeId: String,
-    @ColumnInfo(name = "category")
-    @SerializedName("category_id")
-    val category_id: String,
+    val id: String,
+    val category: Category,
     @ColumnInfo(name = "title")
     @SerializedName("title")
     val title: String,
@@ -20,10 +18,8 @@ data class Recipe(
     @ColumnInfo(name = "recipe")
     @SerializedName("recipe")
     val recipe: String,
-    @ColumnInfo(name = "author")
-    @SerializedName("user_id")
-    val authorName: String,
-    @ColumnInfo(name = "imagepath")
-    @SerializedName("imagepath")
+    val user: User,
+    @ColumnInfo(name = "imagePath")
+    @SerializedName("imagePath")
     val imagePath: String
 )

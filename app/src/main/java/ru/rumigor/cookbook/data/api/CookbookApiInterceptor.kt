@@ -9,7 +9,7 @@ object CookbookApiInterceptor: Interceptor {
         chain.proceed(
             chain.request()
                 .newBuilder()
-                .addHeader("cookbook", "localhost:8081/cookbook/")
+                .addHeader("cookbook", "10.0.2.2/cookbook/rest/")
                 .build()
         )
 }

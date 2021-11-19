@@ -3,10 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/activity_main.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/item_view.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/mainfragment_view.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipe_fragment.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipe_view.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipes_fragment.xml" value="0.20520833333333333" />
       </map>
     </option>
   </component>

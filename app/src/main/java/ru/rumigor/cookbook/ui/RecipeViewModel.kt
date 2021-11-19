@@ -1,25 +1,27 @@
 package ru.rumigor.cookbook.ui
 
+import ru.rumigor.cookbook.data.model.Category
 import ru.rumigor.cookbook.data.model.Recipe
+import ru.rumigor.cookbook.data.model.User
 
 class RecipeViewModel(
     val recipeId: String,
-    val categoryId: String,
+    val category: Category,
     val title: String,
     val description: String,
     val recipe: String,
-    val authorName: String,
+    val user: User,
     val imagePath: String
 ) {
     object Mapper{
         fun map(recipe: Recipe) =
             RecipeViewModel(
-                recipe.recipeId,
-                recipe.category_id,
+                recipe.id,
+                recipe.category,
                 recipe.title,
                 recipe.description,
                 recipe.recipe,
-                recipe.authorName,
+                recipe.user,
                 recipe.imagePath
             )
     }

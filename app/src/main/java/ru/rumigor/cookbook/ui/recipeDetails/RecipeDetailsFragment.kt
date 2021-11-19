@@ -1,5 +1,7 @@
 package ru.rumigor.cookbook.ui.recipeDetails
 
+import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -13,10 +15,11 @@ import ru.rumigor.cookbook.scheduler.Schedulers
 import ru.rumigor.cookbook.ui.RecipeViewModel
 import ru.rumigor.cookbook.ui.abs.AbsFragment
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
-class RecipeDetailsFragment: AbsFragment(R.layout.recipe_fragment), RecipeDetailsView {
+class RecipeDetailsFragment : AbsFragment(R.layout.recipe_fragment), RecipeDetailsView {
 
-    companion object Factory{
+    companion object Factory {
         private const val ARG_RECIPE_ID = "arg_recipe_id"
 
         fun newInstance(recipeId: String): Fragment =
@@ -45,20 +48,23 @@ class RecipeDetailsFragment: AbsFragment(R.layout.recipe_fragment), RecipeDetail
     private val ui: RecipeFragmentBinding by viewBinding()
 
     override fun showRecipe(recipe: RecipeViewModel) {
-        context?.let{
+        context?.let {
             Glide.with(it)
                 .load(recipe.imagePath)
-                .into(ui.imageView)
+                .into(ui.dishPic)
         }
 
         ui.recipeTitle.text = recipe.title
 
         ui.recipeDetails.text = recipe.recipe
+
+        ui.authorName.text = "Автор: " + recipe.user.username
+
+        ui.authorEmail.text = "E-mail: " + recipe.user.email
     }
 
     override fun showError(error: Throwable) {
         Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
     }
-
 
 }
