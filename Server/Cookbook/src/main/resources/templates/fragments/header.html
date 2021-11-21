@@ -4,8 +4,14 @@
     </head>
     <body>
         <nav class="navbar navbar-dark bg-dark" th:fragment="header">
-            <span class="navbar-brand mb-0 h1">Cookbook Cosa Nostra</span>
-            <a th:href="@{/recipes/recipe}" href="#" class="btn btn-primary">Добавить рецепт</a>
+            <a th:href="@{/recipes}" href="#" class="navbar-brand mb-0 h1">Cookbook Cosa Nostra</a>
+
+            <form class="d-flex" th:action="@{/recipes/search}" method="get">
+                <input class="form-control me-2" type="search" th:name="title" placeholder="Поиск по названию"/>
+                <button type="submit" class="btn btn-outline-success">Поиск</button>
+            </form>
+
+            <a th:href="@{/recipes/add_recipe}" href="#" class="btn btn-primary">Добавить рецепт</a>
         </nav>
     </body>
 </html>
