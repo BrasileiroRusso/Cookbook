@@ -1,13 +1,12 @@
 package ru.rumigor.cookbook.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
-import ru.rumigor.cookbook.R
 import ru.rumigor.cookbook.ui.abs.AbsActivity
 import ru.rumigor.cookbook.ui.main.MainScreen
+import ru.rumigor.cookbook.ui.recipesList.RecipesListScreen
 import javax.inject.Inject
 
 class MainActivity : AbsActivity() {

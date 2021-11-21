@@ -1,4 +1,4 @@
-package ru.rumigor.cookbook.ui.main
+package ru.rumigor.cookbook.ui
 
 import android.annotation.SuppressLint
 import android.content.Context

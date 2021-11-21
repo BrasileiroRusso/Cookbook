@@ -1,7 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/recipes"
+    android:id="@+id/mainfragmentlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/menuList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16pt"
+            app:srcCompat="@drawable/cookbook" />
+
+        <Button
+            android:id="@+id/allRecipes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Открыть все рецепты" />
+
+        <Button
+            android:id="@+id/cusineButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Выбрать кухню" />
+
+        <Button
+            android:id="@+id/categoryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Выбрать категорию" />
+
+        <Button
+            android:id="@+id/topButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Топ-10" />
+
+        <Button
+            android:id="@+id/quickRecepiesButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10 быстрых рецептов" />
+
+        <Button
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Поиск рецептов" />
+
+        <Button
+            android:id="@+id/favorites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Избранное" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_magin"
+        android:layout_marginBottom="@dimen/fab_magin"
+        android:backgroundTint="#FFECB3"
+        android:backgroundTintMode="add"
+        android:contentDescription="@string/add_new_recipe"
+        android:focusable="true"
+        app:backgroundTint="@color/silver"
+        app:fabSize="normal"
+        app:layout_anchor="@id/menuList"
+        app:layout_anchorGravity="bottom|end"
+        app:layout_behavior=".ui.FABBehavior"
+        app:srcCompat="@drawable/newnote" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

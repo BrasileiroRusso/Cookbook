@@ -3,16 +3,23 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/activity_main.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/item_view.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/mainfragment_view.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipe_fragment.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipe_view.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/LEP/Documents/Cookbook/app/src/main/res/layout/recipes_fragment.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/activity_main.xml" value="0.1308876811594203" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/addrecipe_view.xml" value="0.13020833333333334" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/content_main.xml" value="0.10454155955441302" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/mainfragment_view.xml" value="0.1" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/recipe_fragment.xml" value="0.10454155955441302" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/recipe_view.xml" value="0.10454155955441302" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/recipes_fragment.xml" value="0.10454155955441302" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/recipeslistfragment_view.xml" value="0.1308876811594203" />
+        <entry key="..\:/Users/rumig/AndroidStudioProjects/Cookbook/app/src/main/res/layout/settings_dialogfragment.xml" value="0.10964912280701754" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

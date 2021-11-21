@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
+import com.github.terrakok.cicerone.Router
 import moxy.ktx.moxyPresenter
 import ru.rumigor.cookbook.R
 import ru.rumigor.cookbook.arguments
@@ -36,12 +37,16 @@ class RecipeDetailsFragment : AbsFragment(R.layout.recipe_fragment), RecipeDetai
     @Inject
     lateinit var recipeRepository: RecipeRepository
 
+    @Inject
+    lateinit var router: Router
+
     @Suppress("unused")
     private val presenter: RecipeDetailsPresenter by moxyPresenter {
         RecipeDetailsPresenter(
             recipeId,
             schedulers = schedulers,
-            recipeRepository = recipeRepository
+            recipeRepository = recipeRepository,
+            router = router
         )
     }
 
@@ -61,10 +66,15 @@ class RecipeDetailsFragment : AbsFragment(R.layout.recipe_fragment), RecipeDetai
         ui.authorName.text = "Автор: " + recipe.user.username
 
         ui.authorEmail.text = "E-mail: " + recipe.user.email
+
+        ui.fabUpdate.setOnClickListener {
+            presenter.updateRecipe(recipe)
+        }
     }
 
     override fun showError(error: Throwable) {
         Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
     }
+
 
 }

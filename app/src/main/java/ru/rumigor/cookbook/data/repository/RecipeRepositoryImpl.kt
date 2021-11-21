@@ -1,9 +1,11 @@
 package ru.rumigor.cookbook.data.repository
 
 import io.reactivex.rxjava3.core.Observable
+import okhttp3.ResponseBody
 import ru.rumigor.cookbook.data.api.CookbookApi
 import ru.rumigor.cookbook.data.model.Category
 import ru.rumigor.cookbook.data.model.Recipe
+import ru.rumigor.cookbook.data.model.ServerResponse
 import javax.inject.Inject
 
 class RecipeRepositoryImpl @Inject constructor(
@@ -41,9 +43,18 @@ class RecipeRepositoryImpl @Inject constructor(
             .toObservable()
 
 
-//    override fun addRecipe(recipe: Recipe): Observable<ResponseBody> =
-//        cookbookApi
-//            .addRecipe(recipe)
-//            .toObservable()
+    override fun addRecipe(recipe: Recipe): Observable<ServerResponse> =
+        cookbookApi
+            .addRecipe(recipe)
+            .toObservable()
 
+    override fun updateRecipe(recipe: Recipe): Observable<ServerResponse> =
+        cookbookApi
+            .updateRecipe(recipe)
+            .toObservable()
+
+    override fun deleteRecipe(recipeId: String): Observable<ServerResponse> =
+        cookbookApi
+            .deleteRecipe(recipeId)
+            .toObservable()
 }

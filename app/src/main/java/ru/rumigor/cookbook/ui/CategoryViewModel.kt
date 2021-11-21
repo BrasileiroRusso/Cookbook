@@ -4,7 +4,7 @@ import ru.rumigor.cookbook.data.model.Category
 import ru.rumigor.cookbook.data.model.Recipe
 
 class CategoryViewModel(
-    val id: String,
+    val id: Int,
     val tittle: String
 ) {
     object Mapper{

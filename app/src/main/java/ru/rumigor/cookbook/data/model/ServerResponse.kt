@@ -1,14 +1,12 @@
 package ru.rumigor.cookbook.data.model
 
-import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-data class Category(
+data class ServerResponse(
     @PrimaryKey
     @SerializedName("id")
-    val id: Int,
-    @ColumnInfo(name = "title")
-    @SerializedName("title")
-    val title: String,
+    val id: Long,
+    @SerializedName("timestamp")
+    val timestamp: Long,
 )

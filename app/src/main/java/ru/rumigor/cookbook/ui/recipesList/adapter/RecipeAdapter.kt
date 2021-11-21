@@ -1,4 +1,4 @@
-package ru.rumigor.cookbook.ui.main.adapter
+package ru.rumigor.cookbook.ui.recipesList.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

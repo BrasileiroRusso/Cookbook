@@ -10,64 +10,42 @@ import com.github.terrakok.cicerone.Router
 import moxy.ktx.moxyPresenter
 import ru.rumigor.cookbook.R
 import ru.rumigor.cookbook.arguments
-import ru.rumigor.cookbook.data.repository.RecipeRepository
 import ru.rumigor.cookbook.databinding.MainfragmentViewBinding
-import ru.rumigor.cookbook.databinding.RecipeFragmentBinding
-import ru.rumigor.cookbook.databinding.RecipesFragmentBinding
-import ru.rumigor.cookbook.scheduler.Schedulers
-import ru.rumigor.cookbook.ui.RecipeViewModel
 import ru.rumigor.cookbook.ui.abs.AbsFragment
-import ru.rumigor.cookbook.ui.main.adapter.RecipeAdapter
+import ru.rumigor.cookbook.ui.addRecipe.AddRecipePresenter
 import javax.inject.Inject
 
-class MainFragment: AbsFragment(R.layout.recipes_fragment), MainView, RecipeAdapter.Delegate {
+class MainFragment: AbsFragment(R.layout.mainfragment_view), MainView {
 
-    companion object{
+    companion object Factory{
         fun newInstance(): Fragment = MainFragment().arguments()
     }
+
+    override fun showError(error: Throwable) {
+        Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
+        Log.d("ERROR", error.message.toString())
+    }
+
+    private val ui: MainfragmentViewBinding by viewBinding()
 
     @Inject
     lateinit var router: Router
 
-    @Inject
-    lateinit var schedulers: Schedulers
-
-    @Inject
-    lateinit var recipeRepository: RecipeRepository
-
-    @Suppress("unused")
     private val presenter: MainPresenter by moxyPresenter {
         MainPresenter(
-            router = router,
-            schedulers = schedulers,
-            recipeRepository = recipeRepository
+            router = router
         )
     }
 
-    private val ui: RecipesFragmentBinding by viewBinding()
-    private val recipeAdapter = RecipeAdapter(delegate = this)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ui.allRecipes.setOnClickListener {
+            presenter.displayRecipes()
+        }
 
-        ui.recipesList.adapter = recipeAdapter
-    }
-
-    override fun showRecipes(recipes: List<RecipeViewModel>) {
-        recipeAdapter.submitList(recipes)
-    }
-
-    override fun showError(error: Throwable) {
-        Toast.makeText(
-            requireContext(),
-            "Sorry, something go wrong(",
-            Toast.LENGTH_LONG
-        ).show()
-        Log.d("ERROR", error.message.toString())
-    }
-
-    override fun onRecipePicked(recipe: RecipeViewModel) {
-            presenter.displayRecipe(recipe)
+        ui.fab.setOnClickListener {
+            presenter.addRecipe()
+        }
     }
 
 
