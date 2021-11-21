@@ -12,22 +12,15 @@
 
     <div class="row row-cols-1 row-cols-md-4 g-4">
         <div th:each="recipe : ${recipes}" class="card" style="width: 18rem;">
-            <div th:text="${recipe.category.title}" class="card-header">Category
-            </div>
-
+            <div th:text="${recipe.category.title}" class="card-header">Category</div>
             <img th:src="@{${recipe.imagePath}}" class="card-img-top" alt="plate image">
-
             <div class="card-body">
-                <a th:href="@{/recipes/recipe/{recipe_id}(recipe_id = ${recipe.id})}" href="#">
-                    <h5 th:text="${recipe.title}" class="card-title">Plate title</h5>
-                </a>
+                <h5 th:text="${recipe.title}" class="card-title">Plate title</h5>
                 <p th:text="${recipe.description}" class="card-text">Plate description</p>
-
                 <div class="justify-content">
-                    <a th:href="@{/recipes/add_recipe(recipe_id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
-                    <a th:href="@{/recipes/remove(recipe_id=${recipe.id})}" href="#" class="btn btn-danger">Удалить</a>
+                    <a th:href="@{/recipes/recipe(id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
+                    <a th:href="@{/recipes/recipe(id=${recipe.id})}" href="#" class="btn btn-danger">Удалить</a>
                 </div>
-
             </div>
         </div>
     </div>
