@@ -5,22 +5,29 @@
     <title>Cookbook</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <body>
-    <div class="container mt-15 mb-15">
+<div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
 
-    <h2>Наши рецепты</h2>
+    <h1>Список рецептов</h1>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div th:each="recipe : ${recipes}" class="card" style="width: 20rem">
-            <div th:text="${recipe.category.title}" class="card-header">Category</div>
-            <img th:src="@{${recipe.imagePath}}" class="card-img-top" alt="plate image">
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div th:each="recipe : ${recipes}" class="card" style="width: 18rem;">
+            <div th:text="${recipe.category.title}" class="card-header">Category
+            </div>
+
+            <img th:src="@{'/' + ${recipe.imagePath}}" class="card-img-top" alt="plate image">
+
             <div class="card-body">
-                <h5 th:text="${recipe.title}" class="card-title">Plate title</h5>
+                <a th:href="@{/recipes/recipe/{recipe_id}(recipe_id = ${recipe.id})}" href="#">
+                    <h5 th:text="${recipe.title}" class="card-title">Plate title</h5>
+                </a>
                 <p th:text="${recipe.description}" class="card-text">Plate description</p>
+
                 <div class="justify-content">
-                    <a th:href="@{/recipes/recipe(id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
-                    <a th:href="@{/recipes/recipe(id=${recipe.id})}" href="#" class="btn btn-danger">Удалить</a>
+                    <a th:href="@{/recipes/add_recipe(recipe_id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
+                    <a th:href="@{/recipes/remove(recipe_id=${recipe.id})}" href="#" class="btn btn-danger">Удалить</a>
                 </div>
+
             </div>
         </div>
     </div>
@@ -28,7 +35,7 @@
     <div th:replace="~{fragments/footer::footer}">
         Footer
     </div>
-    </div>
+</div>
 
-    </body>
+</body>
 </html>

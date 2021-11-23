@@ -1,12 +1,10 @@
 package ru.geekbrains.cookbook.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
-@Data
 @Table(name = "users")
 public class User {
     @Id
@@ -30,4 +28,24 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore
     private Collection<Role> roles;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

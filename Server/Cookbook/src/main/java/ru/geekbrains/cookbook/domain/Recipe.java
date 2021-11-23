@@ -1,7 +1,13 @@
 package ru.geekbrains.cookbook.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.geekbrains.cookbook.auth.*;
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "recipe")
@@ -24,11 +30,20 @@ public class Recipe {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    @JsonManagedReference
+    private Set<RecipeIngredient> ingredients;
+
     @Column(name = "recipe", nullable = false)
     private String recipe;
 
     @Column(name = "imagepath")
     private String imagePath;
+
+    @ElementCollection
+    @CollectionTable(name = "recipe_step")
+    @MapKeyColumn(name = "step_num")
+    private Map<Integer, RecipeStep> steps = new HashMap<Integer, RecipeStep>();
 
     public Recipe(){
     }
@@ -61,6 +76,14 @@ public class Recipe {
         return imagePath;
     }
 
+    public Set<RecipeIngredient> getIngredients() {
+        return ingredients;
+    }
+
+    public Map<Integer, RecipeStep> getSteps() {
+        return steps;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -87,5 +110,24 @@ public class Recipe {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public void setIngredients(Set<RecipeIngredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setSteps(Map<Integer, RecipeStep> steps) {
+        this.steps = steps;
+    }
+
+    @Embeddable
+    @NoArgsConstructor
+    @Data
+    public static class RecipeStep{
+        @Column(name = "description", nullable = false)
+        private String description;
+
+        @Column(name = "image_path")
+        private String imagePath;
     }
 }

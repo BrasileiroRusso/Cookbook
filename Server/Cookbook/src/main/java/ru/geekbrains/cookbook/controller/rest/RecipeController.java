@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.controller.rest.response.OKResponse;
 import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.domain.RecipeIngredient;
 import ru.geekbrains.cookbook.service.RecipeService;
 import java.util.List;
 
@@ -31,14 +32,14 @@ public class RecipeController {
     public ResponseEntity<OKResponse> addRecipe(@RequestBody Recipe recipe) {
         System.out.println("Rest Recipe POST: " + recipe);
         recipe.setId(null);
-        recipe = recipeService.saveRecipe(recipe);
+        recipe = recipeService.saveRecipe(recipe, null);
         return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.CREATED);
     }
 
     @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<OKResponse> updateRecipe(@RequestBody Recipe recipe) {
         System.out.println("Rest Recipe PUT: " + recipe);
-        recipe = recipeService.saveRecipe(recipe);
+        recipe = recipeService.saveRecipe(recipe, null);
         return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.OK);
     }
 

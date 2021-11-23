@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw exc;
         }
         catch(DataIntegrityViolationException e){
-            CategoryCannotDeleteException exc = new CategoryCannotDeleteException(String.format("Cannot remove the category with ID=%d cause it has linked products", id));
+            CategoryCannotDeleteException exc = new CategoryCannotDeleteException(String.format("Cannot remove the category with ID=%d cause it has linked recipes", id));
             exc.initCause(e);
             throw exc;
         }

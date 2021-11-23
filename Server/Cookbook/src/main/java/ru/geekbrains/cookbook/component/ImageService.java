@@ -10,22 +10,25 @@ import java.nio.file.Paths;
 
 @Component
 public class ImageService {
-
-    @Value("C:/Image")
+    @Value("C:")
     private String mainFolderPath;
+
+    @Value("data/image")
+    private String imagesFolder;
 
     private ImageService() {}
 
-    public Path saveImage(MultipartFile imageFile, String folder) {
+    public String saveImage(MultipartFile imageFile, String folder) {
         if (imageFile == null) {
             throw new IllegalArgumentException("Image file can not be null!");
         }
-        String imageFolder = mainFolderPath + '/' + folder;
+        String imagePath = imagesFolder + '/' + folder + '/' + imageFile.getOriginalFilename();
+        String imageFolder = mainFolderPath + '/' + imagesFolder + '/' + folder;
         createDirectories(Paths.get(imageFolder));
         Path savePath = Paths.get(imageFolder, imageFile.getOriginalFilename());
         saveFile(imageFile, Paths.get(savePath.toString()));
 
-        return savePath;
+        return imagePath;
     }
 
     private void createDirectories(Path path) {
