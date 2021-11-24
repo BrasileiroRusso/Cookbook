@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.geekbrains.cookbook.component.ImageService;
+import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.RecipeIngredient;
 import ru.geekbrains.cookbook.repository.RecipeIngredientRepository;
 import ru.geekbrains.cookbook.repository.RecipeRepository;
+import ru.geekbrains.cookbook.repository.specification.RecipeSpecification;
+import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.exception.RecipeNotFoundException;
-
-import java.nio.file.Path;
 import java.util.*;
 
 @Service("recipeService")
@@ -22,11 +23,21 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final ImageService imageService;
+    private final CategoryService categoryService;
 
     @Override
     @Transactional
     public List<Recipe> findAll() {
         return recipeRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public List<Recipe> findAll(Long categoryId, String titleRegex) {
+        Category category = null;
+        if(categoryId != null)
+            category = categoryService.getCategoryById(categoryId);
+        return recipeRepository.findAll(RecipeSpecification.recipeFilter(category, titleRegex));
     }
 
     @Override
@@ -42,7 +53,6 @@ public class RecipeServiceImpl implements RecipeService {
         Set<RecipeIngredient> ingredients = recipe.getIngredients();
         if(recipe.getId() != null){
             newRecipe = recipeRepository.findById(recipe.getId()).orElseThrow(RecipeNotFoundException::new);
-            newRecipe.setRecipe(recipe.getRecipe());
             newRecipe.setCategory(recipe.getCategory());
             newRecipe.setDescription(recipe.getDescription());
             newRecipe.setTitle(recipe.getTitle());

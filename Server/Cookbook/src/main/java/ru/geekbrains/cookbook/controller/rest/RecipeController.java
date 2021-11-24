@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.controller.rest.response.OKResponse;
 import ru.geekbrains.cookbook.domain.Recipe;
-import ru.geekbrains.cookbook.domain.RecipeIngredient;
 import ru.geekbrains.cookbook.service.RecipeService;
 import java.util.List;
 

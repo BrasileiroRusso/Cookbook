@@ -8,7 +8,20 @@
 <div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
 
-    <h1>Список рецептов</h1>
+    <p>
+    <form th:action="@{/recipes}" method="get">
+        <label class="lbl" th:for="categoryId">Категория</label>
+        <select th:name="categoryId" th:id="categoryId">
+            <option value="" label="ALL"></option>
+            <option th:each="c : ${categories}" th:value="${c.id}" th:label="${c.title}"></option>
+        </select>
+        <label class="lbl" th:for="title">Наименование блюда</label>
+        <input type="text" th:name="title" th:id="title">
+        <button type="submit" class="btn btn-outline-primary btn-sm">Поиск</button>
+    </form>
+    </p>
+
+    <h2>Список рецептов</h2>
 
     <div class="row row-cols-1 row-cols-md-4 g-4">
         <div th:each="recipe : ${recipes}" class="card" style="width: 18rem;">

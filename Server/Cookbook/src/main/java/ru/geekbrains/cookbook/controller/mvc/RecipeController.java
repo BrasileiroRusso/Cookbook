@@ -9,7 +9,6 @@ import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UserService;
-
 import javax.validation.Validator;
 import java.util.List;
 
@@ -23,8 +22,10 @@ public class RecipeController {
     private final Validator validator;
 
     @GetMapping
-    public String getRecipeList(Model model){
-        List<Recipe> recipes = recipeService.findAll();
+    public String getRecipeList(Model model,
+                                @RequestParam(name="categoryId", required = false) Long categoryId,
+                                @RequestParam(name="title", required = false) String titleRegex){
+        List<Recipe> recipes = recipeService.findAll(categoryId, titleRegex);
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("recipes", recipes);
         return "recipe/list";
@@ -37,14 +38,6 @@ public class RecipeController {
         return "recipe/recipe_page";
     }
 
-    @GetMapping("/search")
-    public String searchRecipeByName(@RequestParam(value = "title", required = true) String title, Model model) {
-        /*List<Recipe> recipes = recipeService.findByTitleStartingWith(title);*/
-//        model.addAttribute("recipes", recipes);
-        model.addAttribute("categories", categoryService.findAll());
-        return "recipe/list";
-    }
-
     @GetMapping("/add_recipe")
     public String addRecipe(@RequestParam(value="recipe_id", required = false) Long id, Model model) {
         if(id != null) {
@@ -55,6 +48,7 @@ public class RecipeController {
         }
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("users", userService.getUserList());
+        model.addAttribute("quote", "'");
         return "recipe/add_recipe";
     }
 

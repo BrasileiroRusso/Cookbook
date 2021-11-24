@@ -34,9 +34,6 @@ public class Recipe {
     @JsonManagedReference
     private Set<RecipeIngredient> ingredients;
 
-    @Column(name = "recipe", nullable = false)
-    private String recipe;
-
     @Column(name = "imagepath")
     private String imagePath;
 
@@ -50,10 +47,6 @@ public class Recipe {
 
     public Long getId() {
         return id;
-    }
-
-    public String getRecipe() {
-        return recipe;
     }
 
     public Category getCategory() {
@@ -86,10 +79,6 @@ public class Recipe {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setRecipe(String recipe) {
-        this.recipe = recipe;
     }
 
     public void setCategory(Category category) {
@@ -129,5 +118,13 @@ public class Recipe {
 
         @Column(name = "image_path")
         private String imagePath;
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getImagePath() {
+            return imagePath;
+        }
     }
 }

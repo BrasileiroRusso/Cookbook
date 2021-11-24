@@ -8,18 +8,17 @@
 <body>
 <div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
-
-    <div class="title">
-        <img th:src="@{${recipe.imagePath}}" alt="plate image"/>
-        <h1 th:text="${recipe.title}">Название рецепта</h1>
-        <p> <a th:text="'Автор ' + ${recipe.user.username}">Автор</a> </p>
-        <p th:text="${recipe.description}">Описание</p>
-    </div>
+    <p>
+        <img th:src="@{'/' + ${recipe.imagePath}}" alt="plate image" style="margin-top: 20px;margin-bottom: 10px"/>
+    </p>
+    <h2 th:text="${recipe.title}">Название рецепта</h2>
+    <p> <a th:text="'Автор ' + ${recipe.user.username}">Автор</a></p>
+    <p th:text="${recipe.description}">Описание</p>
 
     <div class="recipe">
         <h2>Пошаговая инструкция</h2>
         <ol>
-            <li th:each="step : ${recipe.recipe}"></li>
+            <li th:each="step : ${recipe.steps}" th:text="${step.getValue().description}"></li>
         </ol>
     </div>
 
