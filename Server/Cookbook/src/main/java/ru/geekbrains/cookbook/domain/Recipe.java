@@ -40,7 +40,7 @@ public class Recipe {
     @ElementCollection
     @CollectionTable(name = "recipe_step")
     @MapKeyColumn(name = "step_num")
-    private Map<Integer, RecipeStep> steps = new HashMap<Integer, RecipeStep>();
+    private Map<Integer, RecipeStep> steps = new HashMap<>();
 
     public Recipe(){
     }
