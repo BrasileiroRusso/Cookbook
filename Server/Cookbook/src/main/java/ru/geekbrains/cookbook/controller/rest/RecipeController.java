@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.controller.rest.response.OKResponse;
-import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.service.RecipeService;
 import java.util.List;
 
@@ -18,28 +18,28 @@ public class RecipeController {
     private RecipeService recipeService;
 
     @GetMapping
-    public List<Recipe> getAllRecipes(){
+    public List<RecipeDto> getAllRecipes(){
         return recipeService.findAll();
     }
 
     @GetMapping("/{recipe_id}")
-    public Recipe getRecipeByID(@PathVariable(value="recipe_id") Long recipeID){
+    public RecipeDto getRecipeByID(@PathVariable(value="recipe_id") Long recipeID){
         return recipeService.getRecipeById(recipeID);
     }
 
     @PostMapping
-    public ResponseEntity<OKResponse> addRecipe(@RequestBody Recipe recipe) {
-        System.out.println("Rest Recipe POST: " + recipe);
-        recipe.setId(null);
-        recipe = recipeService.saveRecipe(recipe, null);
-        return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.CREATED);
+    public ResponseEntity<OKResponse> addRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println("Rest Recipe POST: " + recipeDto);
+        recipeDto.setId(null);
+        recipeDto = recipeService.saveRecipe(recipeDto, null);
+        return new ResponseEntity<>(new OKResponse(recipeDto.getId(), System.currentTimeMillis()), HttpStatus.CREATED);
     }
 
     @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<OKResponse> updateRecipe(@RequestBody Recipe recipe) {
-        System.out.println("Rest Recipe PUT: " + recipe);
-        recipe = recipeService.saveRecipe(recipe, null);
-        return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.OK);
+    public ResponseEntity<OKResponse> updateRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println("Rest Recipe PUT: " + recipeDto);
+        recipeDto = recipeService.saveRecipe(recipeDto, null);
+        return new ResponseEntity<>(new OKResponse(recipeDto.getId(), System.currentTimeMillis()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{recipe_id}")
