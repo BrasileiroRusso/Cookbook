@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UserService;
@@ -25,7 +25,7 @@ public class RecipeController {
     public String getRecipeList(Model model,
                                 @RequestParam(name="categoryId", required = false) Long categoryId,
                                 @RequestParam(name="title", required = false) String titleRegex){
-        List<Recipe> recipes = recipeService.findAll(categoryId, titleRegex);
+        List<RecipeDto> recipes = recipeService.findAll(categoryId, titleRegex);
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("recipes", recipes);
         return "recipe/list";
@@ -33,7 +33,7 @@ public class RecipeController {
 
     @GetMapping("/recipe/{recipe_id}")
     public String getRecipeById(@PathVariable(value="recipe_id") Long id, Model model){
-        Recipe recipe = recipeService.getRecipeById(id);
+        RecipeDto recipe = recipeService.getRecipeById(id);
         model.addAttribute("recipe", recipe);
         return "recipe/recipe_page";
     }
@@ -41,10 +41,10 @@ public class RecipeController {
     @GetMapping("/add_recipe")
     public String addRecipe(@RequestParam(value="recipe_id", required = false) Long id, Model model) {
         if(id != null) {
-            Recipe recipe = recipeService.getRecipeById(id);
+            RecipeDto recipe = recipeService.getRecipeById(id);
             model.addAttribute("recipe", recipe);
         } else {
-            model.addAttribute("recipe", new Recipe());
+            model.addAttribute("recipe", new RecipeDto());
         }
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("users", userService.getUserList());
@@ -53,7 +53,7 @@ public class RecipeController {
     }
 
     @PostMapping("/add_recipe")
-    public String createNewRecipe(@ModelAttribute("recipe") Recipe recipe, MultipartFile image) {
+    public String createNewRecipe(@ModelAttribute("recipe") RecipeDto recipe, MultipartFile image) {
         System.out.println("UserID = " + recipe.getUser().getId());
         recipeService.saveRecipe(recipe, image);
         return "redirect:/recipes";

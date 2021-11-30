@@ -1,0 +1,1 @@
+ALTER TABLE uploaded_file ADD COLUMN upload_time timestamp;

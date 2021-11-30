@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "recipe")
@@ -40,7 +41,7 @@ public class Recipe {
     @ElementCollection
     @CollectionTable(name = "recipe_step")
     @MapKeyColumn(name = "step_num")
-    private Map<Integer, RecipeStep> steps = new HashMap<Integer, RecipeStep>();
+    private Map<Integer, RecipeStep> steps = new HashMap<>();
 
     public Recipe(){
     }
@@ -127,4 +128,5 @@ public class Recipe {
             return imagePath;
         }
     }
+
 }

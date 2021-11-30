@@ -8,7 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.controller.rest.response.OKResponse;
 import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
+import ru.geekbrains.cookbook.dto.RecipeDto;
+import ru.geekbrains.cookbook.file.UploadFile;
 import ru.geekbrains.cookbook.service.RecipeService;
+import ru.geekbrains.cookbook.service.UploadFileService;
+
 import java.util.List;
 
 @RestController
@@ -16,30 +21,32 @@ import java.util.List;
 @RequestMapping("/rest/recipe")
 public class RecipeController {
     private RecipeService recipeService;
+    private UploadFileService uploadFileService;
 
     @GetMapping
-    public List<Recipe> getAllRecipes(){
-        return recipeService.findAll();
+    public List<RecipeDto> getAllRecipes(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                                         @RequestParam(value = "name", required = false) String name) {
+        return recipeService.findAll(categoryId, name);
     }
 
     @GetMapping("/{recipe_id}")
-    public Recipe getRecipeByID(@PathVariable(value="recipe_id") Long recipeID){
+    public RecipeDto getRecipeByID(@PathVariable(value="recipe_id") Long recipeID){
         return recipeService.getRecipeById(recipeID);
     }
 
     @PostMapping
-    public ResponseEntity<OKResponse> addRecipe(@RequestBody Recipe recipe) {
-        System.out.println("Rest Recipe POST: " + recipe);
-        recipe.setId(null);
-        recipe = recipeService.saveRecipe(recipe, null);
-        return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.CREATED);
+    public ResponseEntity<OKResponse> addRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println("Rest Recipe POST: " + recipeDto);
+        recipeDto.setId(null);
+        recipeDto = recipeService.saveRecipe(recipeDto, null);
+        return new ResponseEntity<>(new OKResponse(recipeDto.getId(), System.currentTimeMillis()), HttpStatus.CREATED);
     }
 
     @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<OKResponse> updateRecipe(@RequestBody Recipe recipe) {
-        System.out.println("Rest Recipe PUT: " + recipe);
-        recipe = recipeService.saveRecipe(recipe, null);
-        return new ResponseEntity<>(new OKResponse(recipe.getId(), System.currentTimeMillis()), HttpStatus.OK);
+    public ResponseEntity<OKResponse> updateRecipe(@RequestBody RecipeDto recipeDto) {
+        System.out.println("Rest Recipe PUT: " + recipeDto);
+        recipeDto = recipeService.saveRecipe(recipeDto, null);
+        return new ResponseEntity<>(new OKResponse(recipeDto.getId(), System.currentTimeMillis()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{recipe_id}")
@@ -47,6 +54,19 @@ public class RecipeController {
         System.out.println("Rest Recipe DELETE: " + recipeID);
         recipeService.removeRecipe(recipeID);
         return new ResponseEntity<>(new OKResponse(recipeID, System.currentTimeMillis()), HttpStatus.OK);
+    }
+
+    @PostMapping("/{recipe_id}/image")
+    public ResponseEntity<?> addImage(@PathVariable(value="recipe_id") Long recipeID,
+                                      @RequestBody UploadFile uploadFile) {
+        UploadedFileLink uploadedFileLink = uploadFileService.saveUploadFileLink(recipeID, Recipe.class, "", uploadFile.getUrl(), "image");
+        return ResponseEntity.ok().body(uploadedFileLink);
+    }
+
+    @GetMapping("/{recipe_id}/image")
+    public ResponseEntity<?> getAllImages(@PathVariable(value="recipe_id") Long recipeId) {
+        List<UploadedFileLink> uploadedFileLinks = uploadFileService.getUploadedFileListByResource(recipeId, Recipe.class);
+        return ResponseEntity.ok().body(uploadedFileLinks);
     }
 
     @ExceptionHandler(Exception.class)
