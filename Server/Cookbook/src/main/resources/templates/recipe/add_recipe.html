@@ -19,7 +19,7 @@
             <input type="number" th:field="*{id}" hidden>
         </div>
 
-        <img id="imageBox" src="" th:src="@{'/' + ${recipe.imagePath}}" alt="Plate image" style="border: 1px #ccc solid;display:block;width: 360px;height:270px;background-clip:border-box;background-origin:padding-box;object-fit: contain;margin-bottom: 10px">
+        <img id="imageBox" src="" th:src="@{''}" alt="Plate image" style="border: 1px #ccc solid;display:block;width: 360px;height:270px;background-clip:border-box;background-origin:padding-box;object-fit: contain;margin-bottom: 10px">
         <div class="form-group">
             <input type="file" name="image" id="image" onchange="fileSelect(this.files)">
         </div>

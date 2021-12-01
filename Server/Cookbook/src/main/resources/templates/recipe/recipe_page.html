@@ -8,17 +8,16 @@
 <body>
 <div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
-    <p>
-        <img th:src="@{'/' + ${recipe.imagePath}}" alt="plate image" style="margin-top: 20px;margin-bottom: 10px"/>
-    </p>
     <h2 th:text="${recipe.title}">Название рецепта</h2>
-    <p> <a th:text="'Автор ' + ${recipe.user.username}">Автор</a></p>
+    <p> <a th:text="'Автор: ' + ${recipe.user.username}">Автор</a></p>
+    <div th:each="file : ${linkedFiles.files}" class="card" style="width: 18rem;">
+        <img th:src="@{${file.fileUri}}" alt="plate image" style="margin-top: 20px;margin-bottom: 10px"/>
+    </div>
     <p th:text="${recipe.description}">Описание</p>
-
     <div class="recipe">
         <h2>Пошаговая инструкция</h2>
         <ol>
-            <li th:each="step : ${recipe.steps}" th:text="${step.getValue().description}"></li>
+            <li th:each="step : ${recipe.steps}" th:text="${step.description}"></li>
         </ol>
     </div>
 

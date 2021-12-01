@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>Recipe</title>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/default.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{/css/component.css}" />
+		<script th:src="@{/js/modernizr.custom.js}"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div th:replace="~{fragments/header::header}">Header</div>
+			<h2 th:text="${recipe.title}">Название рецепта</h2>
+			<p> <a th:text="'Автор: ' + ${recipe.user.username}">Автор</a></p>
+			<div id="cbp-fwslider" class="cbp-fwslider">
+				<ul>
+					<li th:each="file: ${linkedFiles.files}"><a class = "img_item" href="#"><img src="#" th:src="${file.fileUri}" alt="image" style="border: 1px #ccc solid;display:block;width: 360px;height:270px;background-clip:border-box;background-origin:padding-box;object-fit: contain;margin-bottom: 10px"/></a></li>
+				</ul>
+			</div>
+			<p th:text="${recipe.description}">Описание</p>
+			<div class="recipe">
+				<h2>Пошаговая инструкция</h2>
+				<ol>
+					<li th:each="step : ${recipe.steps}" th:text="${step.description}"></li>
+				</ol>
+			</div>
+
+			<div th:replace="~{fragments/footer::footer}">
+				Footer
+			</div>
+		</div>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script th:src="@{/js/jquery.cbpFWSlider.min.js}"></script>
+		<script>
+			$( function() {
+				$( '#cbp-fwslider' ).cbpFWSlider();
+			} );
+		</script>
+	</body>
+</html>

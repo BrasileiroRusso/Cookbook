@@ -21,6 +21,5 @@ public class RecipeDto {
     private String description;
     private User user;
     private Set<RecipeIngredient> ingredients = new HashSet<>();
-    private String imagePath;
     private List<Recipe.RecipeStep> steps = new ArrayList<>();
 }

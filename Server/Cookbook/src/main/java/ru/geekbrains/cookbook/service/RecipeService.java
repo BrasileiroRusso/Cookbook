@@ -10,6 +10,5 @@ public interface RecipeService {
     List<RecipeDto> findAll(Long categoryId, String titleRegex);
     RecipeDto getRecipeById(Long id);
     RecipeDto saveRecipe(RecipeDto recipe, MultipartFile image);
-    RecipeDto saveImage(Long id, String imagePath);
     boolean removeRecipe(Long id);
 }

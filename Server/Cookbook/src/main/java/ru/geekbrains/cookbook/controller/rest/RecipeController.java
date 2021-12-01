@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.controller.rest.response.OKResponse;
 import ru.geekbrains.cookbook.domain.Recipe;
-import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
+import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.dto.RecipeDto;
-import ru.geekbrains.cookbook.file.UploadFile;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UploadFileService;
-
 import java.util.List;
+import java.util.function.Consumer;
 
 @RestController
 @AllArgsConstructor
@@ -56,17 +55,11 @@ public class RecipeController {
         return new ResponseEntity<>(new OKResponse(recipeID, System.currentTimeMillis()), HttpStatus.OK);
     }
 
-    @PostMapping("/{recipe_id}/image")
-    public ResponseEntity<?> addImage(@PathVariable(value="recipe_id") Long recipeID,
-                                      @RequestBody UploadFile uploadFile) {
-        UploadedFileLink uploadedFileLink = uploadFileService.saveUploadFileLink(recipeID, Recipe.class, "", uploadFile.getUrl(), "image");
-        return ResponseEntity.ok().body(uploadedFileLink);
-    }
-
     @GetMapping("/{recipe_id}/image")
     public ResponseEntity<?> getAllImages(@PathVariable(value="recipe_id") Long recipeId) {
-        List<UploadedFileLink> uploadedFileLinks = uploadFileService.getUploadedFileListByResource(recipeId, Recipe.class);
-        return ResponseEntity.ok().body(uploadedFileLinks);
+        LinkedFiles linkedFiles = uploadFileService.getUploadedFileListByResource(recipeId, Recipe.class);
+        linkedFiles = FileController.transformUriInLinkedFiles(linkedFiles);
+        return ResponseEntity.ok().body(linkedFiles);
     }
 
     @ExceptionHandler(Exception.class)

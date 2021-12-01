@@ -5,9 +5,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.geekbrains.cookbook.controller.rest.FileController;
+import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.RecipeService;
+import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.UserService;
 import javax.validation.Validator;
 import java.util.List;
@@ -19,6 +23,7 @@ public class RecipeController {
     private final RecipeService recipeService;
     private final CategoryService categoryService;
     private final UserService userService;
+    private final UploadFileService uploadFileService;
     private final Validator validator;
 
     @GetMapping
@@ -34,8 +39,11 @@ public class RecipeController {
     @GetMapping("/recipe/{recipe_id}")
     public String getRecipeById(@PathVariable(value="recipe_id") Long id, Model model){
         RecipeDto recipe = recipeService.getRecipeById(id);
+        LinkedFiles linkedFiles = uploadFileService.getUploadedFileListByResource(id, Recipe.class);
+        linkedFiles = FileController.transformUriInLinkedFiles(linkedFiles);
         model.addAttribute("recipe", recipe);
-        return "recipe/recipe_page";
+        model.addAttribute("linkedFiles", linkedFiles);
+        return "recipe/recipe";
     }
 
     @GetMapping("/add_recipe")

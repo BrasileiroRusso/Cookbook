@@ -6,16 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.geekbrains.cookbook.auth.User;
+import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.domain.file.UploadedFile;
 import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
+import ru.geekbrains.cookbook.dto.UploadedFileLinkDto;
 import ru.geekbrains.cookbook.repository.UploadedFileLinkRepository;
 import ru.geekbrains.cookbook.repository.UploadedFileRepository;
 import ru.geekbrains.cookbook.service.FileStorageService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.UserService;
-import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,16 +55,15 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional
-    public UploadedFileLink saveUploadFileLink(Long objectId, Class<?> type, String objectPart, String fileUri, String description) {
+    public UploadedFileLink saveUploadFileLink(UploadedFileLinkDto uploadedFileLinkDto) {
         //String filename = Paths.get(URI.create(fileUri)).getFileName().toString();
-        int pointIndex = fileUri.lastIndexOf("/");
-        String filename = fileUri.substring(pointIndex + 1);
+        String filename = uploadedFileLinkDto.getFilename();
         UploadedFile uploadedFile = uploadedFileRepository.getByFilename(filename).orElseThrow(RuntimeException::new);
         UploadedFileLink uploadedFileLink = new UploadedFileLink();
-        uploadedFileLink.setObjectId(objectId);
-        uploadedFileLink.setObjectType(type.getSimpleName());
-        uploadedFileLink.setObjectPart(objectPart);
-        uploadedFileLink.setDescription(description);
+        uploadedFileLink.setObjectId(uploadedFileLinkDto.getObjectId());
+        uploadedFileLink.setObjectType(uploadedFileLinkDto.getObjectType());
+        uploadedFileLink.setObjectPart(uploadedFileLinkDto.getObjectPart());
+        uploadedFileLink.setDescription(uploadedFileLinkDto.getDescription());
         uploadedFileLink.setUploadedFile(uploadedFile);
         uploadedFileLinkRepository.save(uploadedFileLink);
         return uploadedFileLink;
@@ -71,9 +71,45 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional
-    public List<UploadedFileLink> getUploadedFileListByResource(Long objectId, Class<?> objectType) {
-        return uploadedFileLinkRepository.findAllByObjectIdAndObjectType(objectId, objectType.getSimpleName());
+    public UploadedFileLink getUploadedFileLink(Long linkId) {
+        return uploadedFileLinkRepository.findById(linkId).orElseThrow(RuntimeException::new);
     }
 
+    @Override
+    @Transactional
+    public boolean removeUploadedFileLink(Long linkId) {
+        uploadedFileLinkRepository.deleteById(linkId);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public LinkedFiles getUploadedFileListByResource(Long objectId, Class<?> objectType) {
+        List<UploadedFileLink> uploadedFileLinks = uploadedFileLinkRepository.findAllByObjectIdAndObjectType(objectId, objectType.getSimpleName());
+        LinkedFiles linkedFiles = transformToLinkedFiles(uploadedFileLinks);
+        return linkedFiles;
+    }
+
+    private LinkedFiles transformToLinkedFiles(List<UploadedFileLink> uploadedFileLinks){
+        LinkedFiles linkedFiles = new LinkedFiles();
+        for(UploadedFileLink uploadedFileLink: uploadedFileLinks){
+            String objectPart = uploadedFileLink.getObjectPart();
+            LinkedFiles.FileInfo fileInfo = new LinkedFiles.FileInfo();
+            fileInfo.setFileUri(uploadedFileLink.getUploadedFile().getFilename());
+            fileInfo.setDescription(uploadedFileLink.getDescription());
+            if(objectPart.isEmpty()){
+                linkedFiles.getFiles().add(fileInfo);
+            }
+            else{
+                List<LinkedFiles.FileInfo> fileInfoList = linkedFiles.getEmbeddedFiles().get(objectPart);
+                if(fileInfoList == null){
+                    fileInfoList = new ArrayList<>();
+                    fileInfoList.add(fileInfo);
+                    linkedFiles.getEmbeddedFiles().put(objectPart, fileInfoList);
+                }
+            }
+        }
+        return linkedFiles;
+    }
 
 }
