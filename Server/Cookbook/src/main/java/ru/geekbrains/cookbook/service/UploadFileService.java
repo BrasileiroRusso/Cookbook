@@ -12,7 +12,7 @@ import java.util.List;
 public interface UploadFileService {
     UploadedFile uploadFile(Long userId, MultipartFile file);
     List<UploadedFile> getAllUploadedFiles(Long userId);
-    Resource getFileContent(String filename);
+    byte[] getFileContent(String filename);
     UploadedFileLink saveUploadFileLink(UploadedFileLinkDto uploadedFileLinkDto);
     UploadedFileLink getUploadedFileLink(Long linkId);
     boolean removeUploadedFileLink(Long linkId);

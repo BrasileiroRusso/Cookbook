@@ -1,8 +1,9 @@
 package ru.geekbrains.cookbook.controller.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,15 @@ import java.util.stream.Collectors;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/file")
+@RequestMapping("/api/v1/file")
+@Tag(name = "Хранилище файлов", description = "API для загрузки и получения файлов")
 public class FileController {
     private UploadFileService uploadFileService;
 
-    @PostMapping("/upload")
+    @PostMapping(path = "/upload",
+                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+                 produces = MediaType.APPLICATION_JSON_VALUE
+                )
     public ResponseEntity<?> uploadFile(@RequestParam(value = "userId") Long userId,
                                         MultipartFile file){
         UploadedFile uploadFile = uploadFileService.uploadFile(userId, file);
@@ -43,11 +48,10 @@ public class FileController {
     }
 
     @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename){
-        Resource file = uploadFileService.getFileContent(filename);
+    public ResponseEntity<?> getFile(@PathVariable("filename") String filename){
+        byte[] file = uploadFileService.getFileContent(filename);
         return ResponseEntity.ok()
-                //.header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\""+file.getFilename()+"\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\""+filename+"\"")
                 .body(file);
     }
 

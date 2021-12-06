@@ -31,7 +31,7 @@ public class Recipe {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     @JsonManagedReference
     private Set<RecipeIngredient> ingredients;
 
