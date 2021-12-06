@@ -12,7 +12,6 @@ public class RecipeMapper {
         recipeDto.setDescription(recipe.getDescription());
         recipeDto.setUser(recipe.getUser());
         recipeDto.setIngredients(recipe.getIngredients());
-        recipeDto.setImagePath(recipe.getImagePath());
         recipeDto.setSteps(MapperUtil.mapToList(recipe.getSteps()));
 
         return recipeDto;
@@ -26,7 +25,6 @@ public class RecipeMapper {
         recipe.setDescription(recipeDto.getDescription());
         recipe.setUser(recipeDto.getUser());
         recipe.setIngredients(recipeDto.getIngredients());
-        recipe.setImagePath(recipeDto.getImagePath());
         recipe.setSteps(MapperUtil.listToMap(recipeDto.getSteps()));
 
         return recipe;

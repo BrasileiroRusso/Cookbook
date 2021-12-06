@@ -1,0 +1,1 @@
+ALTER TABLE recipe_step DROP COLUMN image_path;

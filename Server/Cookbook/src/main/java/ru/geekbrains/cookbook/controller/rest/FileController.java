@@ -8,11 +8,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.domain.file.UploadedFile;
+import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
 import ru.geekbrains.cookbook.dto.UploadedFileDto;
+import ru.geekbrains.cookbook.dto.UploadedFileLinkDto;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import java.net.URI;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -38,7 +43,7 @@ public class FileController {
     }
 
     @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable("filename")String filename){
+    public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename){
         Resource file = uploadFileService.getFileContent(filename);
         return ResponseEntity.ok()
                 //.header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
@@ -46,11 +51,46 @@ public class FileController {
                 .body(file);
     }
 
-    private URI getFileUrl(String filename){
+    @PostMapping("/{filename:.+}/link")
+    public ResponseEntity<?> addFileLink(@PathVariable("filename") String filename,
+                                         @RequestBody UploadedFileLinkDto uploadedFileLinkDto) {
+        uploadedFileLinkDto.setFilename(filename);
+        if(uploadedFileLinkDto.getObjectPart() == null)
+            uploadedFileLinkDto.setObjectPart("");
+        UploadedFileLink uploadedFileLink = uploadFileService.saveUploadFileLink(uploadedFileLinkDto);
+        URI newLinkUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(uploadedFileLink.getId())
+                .toUri();
+        return ResponseEntity.created(newLinkUri).build();
+    }
+
+    @GetMapping("/{filename:.+}/link/{id}")
+    public ResponseEntity<?> getFileLink(@PathVariable("filename")String filename,
+                                         @PathVariable("id") Long linkId) {
+        UploadedFileLink uploadedFileLink = uploadFileService.getUploadedFileLink(linkId);
+        return ResponseEntity.ok().body(uploadedFileLink);
+    }
+
+    @DeleteMapping("/{filename:.+}/link/{id}")
+    public ResponseEntity<?> deleteFileLink(@PathVariable("filename")String filename,
+                                            @PathVariable("id") Long linkId) {
+        uploadFileService.removeUploadedFileLink(linkId);
+        return ResponseEntity.ok().build();
+    }
+
+    private static URI getFileUrl(String filename){
         return MvcUriComponentsBuilder.fromController(FileController.class)
                                       .path("/{filename}")
                                       .buildAndExpand(filename)
                                       .toUri();
+    }
+
+    public static LinkedFiles transformUriInLinkedFiles(LinkedFiles linkedFiles){
+        Consumer<LinkedFiles.FileInfo> cons = fileInfo -> fileInfo.setFileUri(getFileUrl(fileInfo.getFileUri()).toString());
+        linkedFiles.getFiles().forEach(cons);
+        linkedFiles.getEmbeddedFiles().forEach((key, value) -> value.forEach(cons));
+        return linkedFiles;
     }
 
     private UploadedFileDto uploadedFileToDto(UploadedFile uploadedFile){

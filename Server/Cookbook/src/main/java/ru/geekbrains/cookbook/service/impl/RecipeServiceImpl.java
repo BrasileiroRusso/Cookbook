@@ -5,7 +5,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.geekbrains.cookbook.component.ImageService;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.RecipeIngredient;
 import ru.geekbrains.cookbook.dto.RecipeDto;
@@ -13,7 +12,6 @@ import ru.geekbrains.cookbook.mapper.RecipeMapper;
 import ru.geekbrains.cookbook.repository.RecipeIngredientRepository;
 import ru.geekbrains.cookbook.repository.RecipeRepository;
 import ru.geekbrains.cookbook.repository.specification.RecipeSpecification;
-import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.exception.RecipeNotFoundException;
 import java.util.*;
@@ -24,16 +22,13 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
-    private final ImageService imageService;
-    private final CategoryService categoryService;
 
     @Override
     @Transactional
     public List<RecipeDto> findAll() {
-        return recipeRepository.findAll().
-                stream().
-                map(RecipeMapper::recipeToDto).
-                collect(Collectors.toList());
+        return recipeRepository.findAll().stream()
+                .map(RecipeMapper::recipeToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -68,13 +63,6 @@ public class RecipeServiceImpl implements RecipeService {
         }
         newRecipe = recipeRepository.save(newRecipe);
 
-        if (image != null && !image.isEmpty()) {
-            String pathImage = imageService.saveImage(image, "recipe");
-            newRecipe.setImagePath(pathImage);
-            newRecipe = recipeRepository.save(newRecipe);
-            System.out.println("Recipe saved: " + newRecipe);
-        }
-
         if(ingredients != null){
             for(RecipeIngredient recipeIngredient: ingredients){
                 recipeIngredient.getId().setRecipeId(newRecipe.getId());
@@ -85,15 +73,6 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         return RecipeMapper.recipeToDto(newRecipe);
-    }
-
-    @Override
-    @Transactional
-    public RecipeDto saveImage(Long id, String imagePath) {
-        Recipe recipe = recipeRepository.findById(id).orElseThrow(RecipeNotFoundException::new);
-        recipe.setImagePath(imagePath);
-        recipe = recipeRepository.save(recipe);
-        return RecipeMapper.recipeToDto(recipe);
     }
 
     @Override

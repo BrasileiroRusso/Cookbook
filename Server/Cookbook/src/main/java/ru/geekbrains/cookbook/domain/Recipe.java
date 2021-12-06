@@ -35,9 +35,6 @@ public class Recipe {
     @JsonManagedReference
     private Set<RecipeIngredient> ingredients;
 
-    @Column(name = "imagepath")
-    private String imagePath;
-
     @ElementCollection
     @CollectionTable(name = "recipe_step")
     @MapKeyColumn(name = "step_num")
@@ -64,10 +61,6 @@ public class Recipe {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getImagePath() {
-        return imagePath;
     }
 
     public Set<RecipeIngredient> getIngredients() {
@@ -98,10 +91,6 @@ public class Recipe {
         this.user = user;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
     public void setIngredients(Set<RecipeIngredient> ingredients) {
         this.ingredients = ingredients;
     }
@@ -117,15 +106,8 @@ public class Recipe {
         @Column(name = "description", nullable = false)
         private String description;
 
-        @Column(name = "image_path")
-        private String imagePath;
-
         public String getDescription() {
             return description;
-        }
-
-        public String getImagePath() {
-            return imagePath;
         }
     }
 
