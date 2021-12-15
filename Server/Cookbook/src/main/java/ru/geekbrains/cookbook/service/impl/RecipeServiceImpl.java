@@ -49,24 +49,46 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public RecipeDto saveRecipe(RecipeDto recipeDto, MultipartFile image) {
+    public RecipeDto saveRecipe(RecipeDto recipeDto) {
         Recipe recipe = RecipeMapper.DtoToRecipe(recipeDto);
         Recipe newRecipe = recipe;
         Set<RecipeIngredient> ingredients = recipe.getIngredients();
+        Long recipeId;
+
         if(recipe.getId() != null){
+            recipeId = recipe.getId();
             newRecipe = recipeRepository.findById(recipe.getId()).orElseThrow(RecipeNotFoundException::new);
             newRecipe.setCategory(recipe.getCategory());
             newRecipe.setDescription(recipe.getDescription());
             newRecipe.setTitle(recipe.getTitle());
             newRecipe.setUser(recipe.getUser());
             newRecipe.setSteps(recipe.getSteps());
+            Set<RecipeIngredient.Id> ids = new HashSet<>();
+            if(ingredients != null){
+                ingredients.forEach(i -> {
+                    i.getId().setRecipeId(recipeId);
+                    i.getId().setIngredientId(i.getIngredient().getId());
+                    ids.add(i.getId());
+                });
+            }
+            if(newRecipe.getIngredients() != null){
+                for(RecipeIngredient recipeIngredient: newRecipe.getIngredients()){
+                    if(!ids.contains(recipeIngredient.getId()))
+                        recipeIngredientRepository.deleteById(recipeIngredient.getId());
+                }
+            }
+            newRecipe.setIngredients(ingredients);
+            newRecipe = recipeRepository.save(newRecipe);
         }
-        newRecipe = recipeRepository.save(newRecipe);
-
-        if(ingredients != null){
-            for(RecipeIngredient recipeIngredient: ingredients){
-                recipeIngredient.getId().setRecipeId(newRecipe.getId());
-                recipeIngredient.getId().setIngredientId(recipeIngredient.getIngredient().getId());
+        else{
+            newRecipe.setIngredients(null);
+            newRecipe = recipeRepository.save(newRecipe);
+            recipeId = newRecipe.getId();
+            if(ingredients != null){
+                ingredients.forEach(i -> {
+                    i.getId().setRecipeId(recipeId);
+                    i.getId().setIngredientId(i.getIngredient().getId());
+                });
             }
             newRecipe.setIngredients(ingredients);
             recipeIngredientRepository.saveAll(newRecipe.getIngredients());

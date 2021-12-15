@@ -9,6 +9,6 @@ public interface RecipeService {
     List<RecipeDto> findAll();
     List<RecipeDto> findAll(Long categoryId, String titleRegex);
     RecipeDto getRecipeById(Long id);
-    RecipeDto saveRecipe(RecipeDto recipe, MultipartFile image);
+    RecipeDto saveRecipe(RecipeDto recipe);
     boolean removeRecipe(Long id);
 }

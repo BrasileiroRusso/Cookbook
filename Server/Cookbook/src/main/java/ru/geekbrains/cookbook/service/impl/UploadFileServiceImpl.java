@@ -1,7 +1,6 @@
 package ru.geekbrains.cookbook.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,6 @@ import ru.geekbrains.cookbook.repository.UploadedFileRepository;
 import ru.geekbrains.cookbook.service.FileStorageService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.UserService;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,9 +30,9 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Transactional
     public UploadedFile uploadFile(Long userId, MultipartFile file) {
         User user = userService.getUser(userId);
-        Path filePath = fileStorageService.save(file);
+        String fileKey = fileStorageService.save(file);
         UploadedFile uploadedFile = new UploadedFile();
-        uploadedFile.setFilename(filePath.toString());
+        uploadedFile.setFilename(fileKey);
         uploadedFile.setUser(user);
         uploadedFile.setUploadTime(new Date());
         uploadedFileRepository.save(uploadedFile);
@@ -48,15 +46,13 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional
-    public Resource getFileContent(String filename) {
-        Resource file = fileStorageService.load(filename);
-        return file;
+    public byte[] getFileContent(String filename) {
+        return fileStorageService.download(filename);
     }
 
     @Override
     @Transactional
     public UploadedFileLink saveUploadFileLink(UploadedFileLinkDto uploadedFileLinkDto) {
-        //String filename = Paths.get(URI.create(fileUri)).getFileName().toString();
         String filename = uploadedFileLinkDto.getFilename();
         UploadedFile uploadedFile = uploadedFileRepository.getByFilename(filename).orElseThrow(RuntimeException::new);
         UploadedFileLink uploadedFileLink = new UploadedFileLink();

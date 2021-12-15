@@ -8,6 +8,16 @@ import java.nio.file.Paths;
 
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
+    /*
+    1) Избранное
+    2) Тэги
+    3) Лайки и дизлайки
+    4) Документация Swagger
+    5) Загрузка файлов и привязка к объектам
+    6) Безопасность
+    7) Веб-интерфейс
+    8) Пагинация
+     */
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

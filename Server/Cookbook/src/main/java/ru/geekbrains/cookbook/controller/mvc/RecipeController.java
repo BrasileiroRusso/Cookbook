@@ -63,7 +63,7 @@ public class RecipeController {
     @PostMapping("/add_recipe")
     public String createNewRecipe(@ModelAttribute("recipe") RecipeDto recipe, MultipartFile image) {
         System.out.println("UserID = " + recipe.getUser().getId());
-        recipeService.saveRecipe(recipe, image);
+        recipeService.saveRecipe(recipe);
         return "redirect:/recipes";
     }
 

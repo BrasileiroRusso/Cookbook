@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookbook</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<body>
+<div class="container mt-15 mb-15">
+    <div th:replace="~{fragments/header::header}">Header</div>
+
+    <div class="title">
+        <img th:src="@{${recipe.imagePath}}" alt="plate image"/>
+        <h1 th:text="${recipe.title}">Название рецепта</h1>
+        <p> <a th:text="'Автор ' + ${recipe.user.username}">Автор</a> </p>
+        <p th:text="${recipe.description}">Описание</p>
+    </div>
+
+    <div class="recipe">
+        <h2>Пошаговая инструкция</h2>
+        <ol>
+            <li th:each="step : ${recipe.recipe}"></li>
+        </ol>
+    </div>
+
+    <div th:replace="~{fragments/footer::footer}">
+        Footer
+    </div>
+
+</div>
+</body>
+</html>
