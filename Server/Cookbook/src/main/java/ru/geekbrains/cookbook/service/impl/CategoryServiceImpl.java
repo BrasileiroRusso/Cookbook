@@ -8,8 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.repository.CategoryRepository;
 import ru.geekbrains.cookbook.service.CategoryService;
-import ru.geekbrains.cookbook.service.exception.CategoryCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.CategoryNotFoundException;
+import ru.geekbrains.cookbook.service.exception.ResourceCannotDeleteException;
+import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public Category getCategoryById(Long id)  {
-        return categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
         if(category.getId() != null){
             Optional<Category> optionalCategory = categoryRepository.findById(category.getId());
             if(!optionalCategory.isPresent())
-                throw new CategoryNotFoundException(String.format("Category with ID=%d doesn't exist", category.getId()));
+                throw new ResourceNotFoundException();
         }
 
         category = categoryRepository.save(category);
@@ -50,12 +51,12 @@ public class CategoryServiceImpl implements CategoryService {
             return true;
         }
         catch(EmptyResultDataAccessException e){
-            CategoryNotFoundException exc = new CategoryNotFoundException(String.format("Category with ID=%d doesn't exist", id));
+            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Category with ID=%d doesn't exist", id));
             exc.initCause(e);
             throw exc;
         }
         catch(DataIntegrityViolationException e){
-            CategoryCannotDeleteException exc = new CategoryCannotDeleteException(String.format("Cannot remove the category with ID=%d cause it has linked recipes", id));
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException(String.format("Cannot remove the category with ID=%d cause it has linked recipes", id));
             exc.initCause(e);
             throw exc;
         }

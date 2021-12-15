@@ -8,6 +8,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class UploadedFileDto {
-    private URI fileUri;
+    private String fileUri;
     private Date uploadTime;
 }

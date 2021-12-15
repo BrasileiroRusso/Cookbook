@@ -13,11 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.domain.Ingredient;
 import ru.geekbrains.cookbook.service.IngredientService;
-import ru.geekbrains.cookbook.service.exception.IngredientCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.IngredientNotFoundException;
 
 import java.util.List;
 
@@ -47,8 +44,8 @@ public class IngredientController {
                     content = {
                             @Content(mediaType = "application/json", schema = @Schema(implementation = Ingredient.class))
                     }),
-            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Ингредиент не найден", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор"),
+            @ApiResponse(responseCode = "404", description = "Ингредиент не найден")
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{ingredient_id}")
@@ -100,12 +97,4 @@ public class IngredientController {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({IngredientNotFoundException.class, IngredientCannotDeleteException.class})
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        System.out.println("Rest Ingredient ERROR");
-        ErrorResponse ErrorResponse = new ErrorResponse();
-        ErrorResponse.setMessage(e.getMessage());
-        ErrorResponse.setTimestamp(System.currentTimeMillis());
-        return new ResponseEntity<>(ErrorResponse, HttpStatus.NOT_FOUND);
-    }
 }

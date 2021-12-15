@@ -74,7 +74,7 @@ public class AWSFileStorageService implements FileStorageService {
         try {
             amazonS3.putObject(bucketName, fileKey, inputStream, objectMetadata);
         } catch (AmazonServiceException e) {
-            throw new IllegalStateException("Failed to upload the file", e);
+            throw new IllegalStateException("Не удалось загрузить файл", e);
         }
     }
 

@@ -8,8 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Ingredient;
 import ru.geekbrains.cookbook.repository.IngredientRepository;
 import ru.geekbrains.cookbook.service.IngredientService;
-import ru.geekbrains.cookbook.service.exception.IngredientCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.IngredientNotFoundException;
+import ru.geekbrains.cookbook.service.exception.ResourceCannotDeleteException;
+import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     @Transactional
     public Ingredient getIngredientById(Long id)  {
-        return ingredientRepository.findById(id).orElseThrow(IngredientNotFoundException::new);
+        return ingredientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class IngredientServiceImpl implements IngredientService {
         if(ingredient.getId() != null){
             Optional<Ingredient> optionalIngredient = ingredientRepository.findById(ingredient.getId());
             if(!optionalIngredient.isPresent())
-                throw new IngredientNotFoundException(String.format("Ingredient with ID=%d doesn't exist", ingredient.getId()));
+                throw new ResourceNotFoundException(String.format("Ingredient with ID=%d doesn't exist", ingredient.getId()));
         }
 
         ingredient = ingredientRepository.save(ingredient);
@@ -50,12 +51,12 @@ public class IngredientServiceImpl implements IngredientService {
             return true;
         }
         catch(EmptyResultDataAccessException e){
-            IngredientNotFoundException exc = new IngredientNotFoundException(String.format("Ingredient with ID=%d doesn't exist", id));
+            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Ingredient with ID=%d doesn't exist", id));
             exc.initCause(e);
             throw exc;
         }
         catch(DataIntegrityViolationException e){
-            IngredientCannotDeleteException exc = new IngredientCannotDeleteException(String.format("Cannot remove the ingredient with ID=%d cause it has linked recipes", id));
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException(String.format("Cannot remove the ingredient with ID=%d cause it has linked recipes", id));
             exc.initCause(e);
             throw exc;
         }

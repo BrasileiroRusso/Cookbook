@@ -13,11 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.service.CategoryService;
-import ru.geekbrains.cookbook.service.exception.CategoryCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.CategoryNotFoundException;
 
 import java.util.List;
 
@@ -47,8 +44,8 @@ public class CategoryController {
                     content = {
                             @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))
                     }),
-            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор категории", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Категория не найдена", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор категории"),
+            @ApiResponse(responseCode = "404", description = "Категория не найдена")
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{category_id}")
@@ -100,12 +97,4 @@ public class CategoryController {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({CategoryNotFoundException.class, CategoryCannotDeleteException.class})
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        System.out.println("Rest Category ERROR");
-        ErrorResponse ErrorResponse = new ErrorResponse();
-        ErrorResponse.setMessage(e.getMessage());
-        ErrorResponse.setTimestamp(System.currentTimeMillis());
-        return new ResponseEntity<>(ErrorResponse, HttpStatus.NOT_FOUND);
-    }
 }
