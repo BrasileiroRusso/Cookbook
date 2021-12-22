@@ -21,7 +21,8 @@ public class RecipeIngredient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", insertable = false, updatable = false)
-    @JsonBackReference
+    //@JsonBackReference
+    @JsonIgnore
     private Recipe recipe;
 
     @ManyToOne

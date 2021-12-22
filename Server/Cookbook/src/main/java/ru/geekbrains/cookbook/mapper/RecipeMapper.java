@@ -1,7 +1,10 @@
 package ru.geekbrains.cookbook.mapper;
 
+import ru.geekbrains.cookbook.controller.rest.RecipeController;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.dto.RecipeDto;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class RecipeMapper {
     public static RecipeDto recipeToDto(Recipe recipe){
@@ -13,6 +16,12 @@ public class RecipeMapper {
         recipeDto.setUser(recipe.getUser());
         recipeDto.setIngredients(recipe.getIngredients());
         recipeDto.setSteps(MapperUtil.mapToList(recipe.getSteps()));
+        recipeDto.setRating(RecipeRatingMapper.recipeRatingToDto(recipe.getRating()));
+
+        recipeDto.add(linkTo(methodOn(RecipeController.class).getRecipeByID(recipe.getId()))
+                .withSelfRel());
+        recipeDto.add(linkTo(methodOn(RecipeController.class).getAllImages(recipe.getId()))
+                .withRel("images"));
 
         return recipeDto;
     }

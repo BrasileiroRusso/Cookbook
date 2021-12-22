@@ -13,12 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.cookbook.controller.rest.response.ErrorResponse;
 import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.domain.Unit;
 import ru.geekbrains.cookbook.service.UnitService;
-import ru.geekbrains.cookbook.service.exception.UnitCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.UnitNotFoundException;
+
 import java.util.List;
 
 @RestController
@@ -47,8 +45,8 @@ public class UnitController {
                     content = {
                             @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))
                     }),
-            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор единицы измерения", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Единица измерения не найдена", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор единицы измерения"),
+            @ApiResponse(responseCode = "404", description = "Единица измерения не найдена")
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{unit_id}")
@@ -100,12 +98,4 @@ public class UnitController {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({UnitNotFoundException.class, UnitCannotDeleteException.class})
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        System.out.println("Rest Unit ERROR");
-        ErrorResponse ErrorResponse = new ErrorResponse();
-        ErrorResponse.setMessage(e.getMessage());
-        ErrorResponse.setTimestamp(System.currentTimeMillis());
-        return new ResponseEntity<>(ErrorResponse, HttpStatus.NOT_FOUND);
-    }
 }

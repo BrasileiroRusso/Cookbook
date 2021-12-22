@@ -1,6 +1,5 @@
 package ru.geekbrains.cookbook.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.geekbrains.cookbook.auth.*;
@@ -8,10 +7,11 @@ import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "recipe")
+@Data
+@NoArgsConstructor
 public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,73 +31,25 @@ public class Recipe {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-    @JsonManagedReference
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    //@JsonManagedReference
     private Set<RecipeIngredient> ingredients;
+
+    @OneToOne(fetch = FetchType.EAGER, optional = true)
+    @PrimaryKeyJoinColumn
+    private RecipeRating rating;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "recipe_tag",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<HashTag> tags;
 
     @ElementCollection
     @CollectionTable(name = "recipe_step")
     @MapKeyColumn(name = "step_num")
     private Map<Integer, RecipeStep> steps = new HashMap<>();
-
-    public Recipe(){
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Set<RecipeIngredient> getIngredients() {
-        return ingredients;
-    }
-
-    public Map<Integer, RecipeStep> getSteps() {
-        return steps;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setIngredients(Set<RecipeIngredient> ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public void setSteps(Map<Integer, RecipeStep> steps) {
-        this.steps = steps;
-    }
 
     @Embeddable
     @NoArgsConstructor

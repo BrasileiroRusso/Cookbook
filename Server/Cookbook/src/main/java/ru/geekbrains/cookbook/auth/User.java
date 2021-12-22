@@ -1,8 +1,12 @@
 package ru.geekbrains.cookbook.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ru.geekbrains.cookbook.domain.Recipe;
+
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -25,9 +29,18 @@ public class User {
     @ManyToMany
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     @JsonIgnore
     private Collection<Role> roles;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "favorite_recipe",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id")
+    )
+    @JsonIgnore
+    private Set<Recipe> favoriteRecipes = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -41,8 +54,16 @@ public class User {
         return password;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public Collection<Role> getRoles() {
         return roles;
+    }
+
+    public Set<Recipe> getFavoriteRecipes() {
+        return favoriteRecipes;
     }
 
     public void setId(Long id) {

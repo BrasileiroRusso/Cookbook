@@ -1,5 +1,7 @@
 package ru.geekbrains.cookbook.domain.file;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -8,6 +10,8 @@ import javax.persistence.*;
 @Table(name = "uploaded_file_link")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UploadedFileLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -28,7 +28,7 @@
             <div th:text="${recipe.category.title}" class="card-header">Category
             </div>
 
-            <img th:src="@{''}" class="card-img-top" alt="plate image">
+            <img th:src="${recipe.imagePath}" class="card-img-top" alt="plate image">
 
             <div class="card-body">
                 <a th:href="@{/recipes/recipe/{recipe_id}(recipe_id = ${recipe.id})}" href="#">

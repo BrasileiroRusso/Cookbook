@@ -1,6 +1,7 @@
 package ru.geekbrains.cookbook.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,13 @@ import ru.geekbrains.cookbook.repository.UploadedFileRepository;
 import ru.geekbrains.cookbook.service.FileStorageService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.UserService;
+import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -28,8 +33,8 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional
-    public UploadedFile uploadFile(Long userId, MultipartFile file) {
-        User user = userService.getUser(userId);
+    public UploadedFile uploadFile(String username, MultipartFile file) {
+        User user = userService.findByUsername(username);
         String fileKey = fileStorageService.save(file);
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setFilename(fileKey);
@@ -40,8 +45,9 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public List<UploadedFile> getAllUploadedFiles(Long userId) {
-        return uploadedFileRepository.findAllByUser_Id(userId);
+    public List<UploadedFile> getAllUploadedFiles(String username) {
+        User user = userService.findByUsername(username);
+        return uploadedFileRepository.findAllByUser_Id(user.getId());
     }
 
     @Override
@@ -67,14 +73,11 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional
-    public UploadedFileLink getUploadedFileLink(Long linkId) {
-        return uploadedFileLinkRepository.findById(linkId).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    @Transactional
-    public boolean removeUploadedFileLink(Long linkId) {
-        uploadedFileLinkRepository.deleteById(linkId);
+    public boolean removeUploadedFileLink(UploadedFileLinkDto uploadedFileLinkDto) {
+        UploadedFileLink uploadedFileLink = uploadedFileLinkRepository.findByObjectIdAndObjectTypeAndObjectPartAndUploadedFile_Filename(
+                uploadedFileLinkDto.getObjectId(), uploadedFileLinkDto.getObjectType(), uploadedFileLinkDto.getObjectPart(), uploadedFileLinkDto.getFilename()).
+                orElseThrow(RuntimeException::new);
+        uploadedFileLinkRepository.deleteById(uploadedFileLink.getId());
         return true;
     }
 
@@ -82,8 +85,18 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Transactional
     public LinkedFiles getUploadedFileListByResource(Long objectId, Class<?> objectType) {
         List<UploadedFileLink> uploadedFileLinks = uploadedFileLinkRepository.findAllByObjectIdAndObjectType(objectId, objectType.getSimpleName());
-        LinkedFiles linkedFiles = transformToLinkedFiles(uploadedFileLinks);
-        return linkedFiles;
+        return transformToLinkedFiles(uploadedFileLinks);
+    }
+
+    @Override
+    @Transactional
+    public Map<Long, String> getUploadedFilesByObjectList(List<Long> ids, Class<?> objectType) {
+        List<UploadedFileLink> fileList = uploadedFileLinkRepository.findDistinctFirstByObjectIdInAndObjectTypeAndObjectPart(ids, objectType.getSimpleName(), "");
+        return fileList.stream()
+                .collect(Collectors.toMap(
+                        UploadedFileLink::getObjectId,
+                        fileLink -> fileLink.getUploadedFile().getFilename(),
+                        (existingValue, newValue) -> existingValue));
     }
 
     private LinkedFiles transformToLinkedFiles(List<UploadedFileLink> uploadedFileLinks){
@@ -100,9 +113,9 @@ public class UploadFileServiceImpl implements UploadFileService {
                 List<LinkedFiles.FileInfo> fileInfoList = linkedFiles.getEmbeddedFiles().get(objectPart);
                 if(fileInfoList == null){
                     fileInfoList = new ArrayList<>();
-                    fileInfoList.add(fileInfo);
                     linkedFiles.getEmbeddedFiles().put(objectPart, fileInfoList);
                 }
+                fileInfoList.add(fileInfo);
             }
         }
         return linkedFiles;

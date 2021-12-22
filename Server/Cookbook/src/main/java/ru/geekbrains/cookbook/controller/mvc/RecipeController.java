@@ -1,11 +1,12 @@
 package ru.geekbrains.cookbook.controller.mvc;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.geekbrains.cookbook.controller.rest.FileController;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.dto.RecipeDto;
@@ -14,7 +15,6 @@ import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.UserService;
 import javax.validation.Validator;
-import java.util.List;
 
 @Controller("mvcRecipeController")
 @RequestMapping("/recipes")
@@ -28,11 +28,14 @@ public class RecipeController {
 
     @GetMapping
     public String getRecipeList(Model model,
+                                Pageable pageable,
                                 @RequestParam(name="categoryId", required = false) Long categoryId,
                                 @RequestParam(name="title", required = false) String titleRegex){
-        List<RecipeDto> recipes = recipeService.findAll(categoryId, titleRegex);
+        Page<RecipeDto> recipesPage = recipeService.findAll(pageable, categoryId, titleRegex);
+        recipesPage.getContent().forEach(r -> r.setImagePath(FileController.getFileUrl(r.getImagePath())));
         model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("recipes", recipes);
+        model.addAttribute("recipes", recipesPage.getContent());
+        model.addAttribute("page", recipesPage);
         return "recipe/list";
     }
 

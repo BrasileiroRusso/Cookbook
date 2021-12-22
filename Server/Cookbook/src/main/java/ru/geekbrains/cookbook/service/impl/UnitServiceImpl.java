@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Unit;
 import ru.geekbrains.cookbook.repository.UnitRepository;
 import ru.geekbrains.cookbook.service.UnitService;
-import ru.geekbrains.cookbook.service.exception.UnitCannotDeleteException;
-import ru.geekbrains.cookbook.service.exception.UnitNotFoundException;
+import ru.geekbrains.cookbook.service.exception.ResourceCannotDeleteException;
+import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class UnitServiceImpl implements UnitService {
     @Override
     @Transactional
     public Unit getUnitById(Long id)  {
-        return unitRepository.findById(id).orElseThrow(UnitNotFoundException::new);
+        return unitRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class UnitServiceImpl implements UnitService {
         if(unit.getId() != null){
             Optional<Unit> optionalUnit = unitRepository.findById(unit.getId());
             if(!optionalUnit.isPresent())
-                throw new UnitNotFoundException(String.format("Unit with ID=%d doesn't exist", unit.getId()));
+                throw new ResourceNotFoundException(String.format("Unit with ID=%d doesn't exist", unit.getId()));
         }
 
         unit = unitRepository.save(unit);
@@ -51,12 +51,12 @@ public class UnitServiceImpl implements UnitService {
             return true;
         }
         catch(EmptyResultDataAccessException e){
-            UnitNotFoundException exc = new UnitNotFoundException(String.format("Unit with ID=%d doesn't exist", id));
+            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Unit with ID=%d doesn't exist", id));
             exc.initCause(e);
             throw exc;
         }
         catch(DataIntegrityViolationException e){
-            UnitCannotDeleteException exc = new UnitCannotDeleteException(String.format("Cannot remove the unit with ID=%d cause it has linked recipes", id));
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException(String.format("Cannot remove the unit with ID=%d cause it has linked recipes", id));
             exc.initCause(e);
             throw exc;
         }
