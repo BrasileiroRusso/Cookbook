@@ -41,8 +41,8 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public Page<RecipeDto> findAll(Pageable pageable, Long categoryId, String titleRegex) {
-        Page<Recipe> page = recipeRepository.findAll(RecipeSpecification.recipeFilter(categoryId, titleRegex), pageable);
+    public Page<RecipeDto> findAll(Pageable pageable, Long categoryId, String titleRegex, Integer prepareTime, List<String> tags, Long authorId) {
+        Page<Recipe> page = recipeRepository.findAll(RecipeSpecification.recipeFilter(categoryId, titleRegex, prepareTime, tags, authorId), pageable);
         Page<RecipeDto> pageDto = page.map(RecipeMapper::recipeToDto);
         List<Long> recipeIds = pageDto.getContent().stream().map(RecipeDto::getId).collect(Collectors.toList());
         Map<Long, String> imageMap = uploadFileService.getUploadedFilesByObjectList(recipeIds, Recipe.class);
@@ -82,6 +82,8 @@ public class RecipeServiceImpl implements RecipeService {
             newRecipe.setUser(recipe.getUser());
             newRecipe.setSteps(recipe.getSteps());
             newRecipe.setTags(recipe.getTags());
+            newRecipe.setPrepareTime(recipe.getPrepareTime());
+            newRecipe.setComment(recipe.getComment());
             Set<RecipeIngredient.Id> ids = new HashSet<>();
             if(ingredients != null){
                 ingredients.forEach(i -> {

@@ -1,11 +1,14 @@
 package ru.geekbrains.cookbook.service;
 
-import ru.geekbrains.cookbook.domain.Category;
+import ru.geekbrains.cookbook.dto.CategoryDto;
+import ru.geekbrains.cookbook.dto.CategoryDtoIn;
+
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> findAll();
-    Category getCategoryById(Long id);
-    Category saveCategory(Category category);
+    List<CategoryDto> findAll();
+    List<CategoryDto> findAll(Long parentId, Boolean childs);
+    CategoryDto getCategoryById(Long id);
+    CategoryDto saveCategory(CategoryDtoIn category);
     boolean removeCategory(Long id);
 }

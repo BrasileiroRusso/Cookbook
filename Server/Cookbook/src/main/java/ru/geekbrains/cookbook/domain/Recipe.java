@@ -1,6 +1,5 @@
 package ru.geekbrains.cookbook.domain;
 
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.geekbrains.cookbook.auth.*;
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "recipe")
-@Data
 @NoArgsConstructor
 public class Recipe {
     @Id
@@ -35,8 +33,8 @@ public class Recipe {
     //@JsonManagedReference
     private Set<RecipeIngredient> ingredients;
 
-    @OneToOne(fetch = FetchType.EAGER, optional = true)
-    @PrimaryKeyJoinColumn
+    @OneToOne(fetch = FetchType.EAGER, optional = true, cascade = {CascadeType.REMOVE})
+    @PrimaryKeyJoinColumn(name = "id", referencedColumnName = "recipe_id")
     private RecipeRating rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -51,9 +49,14 @@ public class Recipe {
     @MapKeyColumn(name = "step_num")
     private Map<Integer, RecipeStep> steps = new HashMap<>();
 
+    @Column(name = "prepare_time")
+    private Integer prepareTime;
+
+    @Column(name = "comment")
+    private String comment;
+
     @Embeddable
     @NoArgsConstructor
-    @Data
     public static class RecipeStep{
         @Column(name = "description", nullable = false)
         private String description;
@@ -61,6 +64,94 @@ public class Recipe {
         public String getDescription() {
             return description;
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Set<RecipeIngredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(Set<RecipeIngredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public RecipeRating getRating() {
+        return rating;
+    }
+
+    public void setRating(RecipeRating rating) {
+        this.rating = rating;
+    }
+
+    public Set<HashTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<HashTag> tags) {
+        this.tags = tags;
+    }
+
+    public Map<Integer, RecipeStep> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(Map<Integer, RecipeStep> steps) {
+        this.steps = steps;
+    }
+
+    public Integer getPrepareTime() {
+        return prepareTime;
+    }
+
+    public void setPrepareTime(Integer prepareTime) {
+        this.prepareTime = prepareTime;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

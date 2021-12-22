@@ -31,7 +31,7 @@ public class RecipeController {
                                 Pageable pageable,
                                 @RequestParam(name="categoryId", required = false) Long categoryId,
                                 @RequestParam(name="title", required = false) String titleRegex){
-        Page<RecipeDto> recipesPage = recipeService.findAll(pageable, categoryId, titleRegex);
+        Page<RecipeDto> recipesPage = recipeService.findAll(pageable, categoryId, titleRegex, null, null);
         recipesPage.getContent().forEach(r -> r.setImagePath(FileController.getFileUrl(r.getImagePath())));
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("recipes", recipesPage.getContent());

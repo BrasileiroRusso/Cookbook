@@ -2,7 +2,6 @@ package ru.geekbrains.cookbook.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.geekbrains.cookbook.auth.User;
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "user_rating")
-@Data
 @NoArgsConstructor
 public class UserRating {
     @EmbeddedId
@@ -22,15 +20,50 @@ public class UserRating {
     @JsonIgnore
     private Recipe recipe;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     @Column(name = "rate")
     private int rate;
 
+    public UserRating(Long recipeId, Long userId){
+        id = new Id(recipeId, userId);
+    }
+
+    public Id getId() {
+        return id;
+    }
+
+    public void setId(Id id) {
+        this.id = id;
+    }
+
+    public Recipe getRecipe() {
+        return recipe;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
+
     @Embeddable
-    @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Id implements Serializable {
@@ -39,6 +72,22 @@ public class UserRating {
 
         @Column(name = "user_id")
         private Long userId;
+
+        public Long getRecipeId() {
+            return recipeId;
+        }
+
+        public void setRecipeId(Long recipeId) {
+            this.recipeId = recipeId;
+        }
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
     }
 
 }

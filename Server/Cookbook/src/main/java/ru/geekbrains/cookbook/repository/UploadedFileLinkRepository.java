@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface UploadedFileLinkRepository extends JpaRepository<UploadedFileLink, Long> {
     List<UploadedFileLink> findAllByObjectIdAndObjectType(Long objectId, String objectType);
-    List<UploadedFileLink> findDistinctFirstByObjectIdInAndObjectTypeAndObjectPart(List<Long> ids, String objectType, String objectPart);
+    List<UploadedFileLink> findAllByObjectIdInAndObjectTypeAndObjectPart(List<Long> ids, String objectType, String objectPart);
     Optional<UploadedFileLink> findByObjectIdAndObjectTypeAndObjectPartAndUploadedFile_Filename(Long objectId, String objectType, String objectPart, String filekey);
 }

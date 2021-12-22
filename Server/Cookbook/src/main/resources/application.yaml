@@ -14,9 +14,26 @@ spring:
     properties:
       hibernate:
         format-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    protocol: smtps
+    username: login@gmail.com
+    password: password
+    properties:
+      mail:
+        transport:
+          protocol: smtps
+        smtps:
+          auth: true
+          starttls:
+            enable: true
+          timeout: 8000
 
 springdoc:
   swagger-ui:
     path: /api_doc.html
 #   operationsSorter: method
 
+support:
+  email: USERNAME@gmail.com

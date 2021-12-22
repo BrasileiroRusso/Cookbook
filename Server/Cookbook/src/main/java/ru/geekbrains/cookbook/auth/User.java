@@ -1,6 +1,8 @@
 package ru.geekbrains.cookbook.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.geekbrains.cookbook.domain.Recipe;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,32 +45,4 @@ public class User {
     )
     @JsonIgnore
     private Set<Recipe> favoriteRecipes = new HashSet<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Collection<Role> getRoles() {
-        return roles;
-    }
-
-    public Set<Recipe> getFavoriteRecipes() {
-        return favoriteRecipes;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

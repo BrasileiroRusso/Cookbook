@@ -52,9 +52,7 @@ public class RatingServiceImpl implements RatingService {
             recipeRating.addToTotalRating(rate - userRating.getRate());
         }
         else{
-            userRating = new UserRating();
-            userRating.getId().setRecipeId(recipeId);
-            userRating.getId().setUserId(userId);
+            userRating = new UserRating(recipeId, userId);
             recipeRating.addToTotalRating(rate);
             recipeRating.incRatings();
         }
