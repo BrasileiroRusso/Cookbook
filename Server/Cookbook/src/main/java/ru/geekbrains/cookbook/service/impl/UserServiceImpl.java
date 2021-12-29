@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -13,6 +14,7 @@ import ru.geekbrains.cookbook.auth.User;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.dto.UserDto;
+import ru.geekbrains.cookbook.event.RegistrationCompletedEvent;
 import ru.geekbrains.cookbook.mapper.RecipeMapper;
 import ru.geekbrains.cookbook.repository.*;
 import ru.geekbrains.cookbook.service.UserService;
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public List<User> getUserList(){
@@ -59,6 +62,7 @@ public class UserServiceImpl implements UserService {
         Role userRole = roleRepository.getByName("ROLE_USER");
         newUser.setRoles(Collections.singletonList(userRole));
         newUser = userRepository.save(newUser);
+        eventPublisher.publishEvent(new RegistrationCompletedEvent(newUser));
         return newUser;
     }
 

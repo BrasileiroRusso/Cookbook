@@ -2,7 +2,12 @@ package ru.geekbrains.cookbook.mapper;
 
 import ru.geekbrains.cookbook.controller.rest.RecipeController;
 import ru.geekbrains.cookbook.domain.Recipe;
+import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.dto.RecipeDto;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -46,5 +51,26 @@ public class RecipeMapper {
         recipe.setComment(recipeDto.getComment());
 
         return recipe;
+    }
+
+    public static List<RecipeDto.Image> linkedFilesToImageList(LinkedFiles linkedFiles){
+        List<RecipeDto.Image> imageList = new ArrayList<>();
+        if(linkedFiles.getFiles() != null)
+            linkedFiles.getFiles().stream().forEach(f -> {
+                RecipeDto.Image image = new RecipeDto.Image();
+                image.setFileKey(f.getFileUri());
+                image.setResourcePart("");
+                imageList.add(image);
+            });
+        if(linkedFiles.getEmbeddedFiles() != null)
+            linkedFiles.getEmbeddedFiles().entrySet().stream().forEach(e -> {
+                e.getValue().forEach(f -> {
+                    RecipeDto.Image image = new RecipeDto.Image();
+                    image.setFileKey(f.getFileUri());
+                    image.setResourcePart(e.getKey());
+                    //imageList.add(image);
+                });
+            });
+        return imageList;
     }
 }

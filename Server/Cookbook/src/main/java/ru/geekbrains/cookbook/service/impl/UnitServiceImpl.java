@@ -74,18 +74,14 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     @Transactional
-    public boolean removeUnit(Long id) {
+    public boolean removeUnit(Long unitId) {
         try{
-            unitRepository.deleteById(id);
+            Unit unit = findUnitById(unitId);
+            unitRepository.delete(unit);
             return true;
         }
-        catch(EmptyResultDataAccessException e){
-            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Unit with ID=%d doesn't exist", id));
-            exc.initCause(e);
-            throw exc;
-        }
         catch(DataIntegrityViolationException e){
-            ResourceCannotDeleteException exc = new ResourceCannotDeleteException(String.format("Cannot remove the unit with ID=%d cause it has linked recipes", id));
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException();
             exc.initCause(e);
             throw exc;
         }
@@ -128,8 +124,16 @@ public class UnitServiceImpl implements UnitService {
     @Override
     @Transactional
     public boolean removeUnitType(Long unitTypeId) {
-        unitTypeRepository.deleteById(unitTypeId);
-        return true;
+        try{
+            UnitType unitType = findUnitTypeById(unitTypeId);
+            unitTypeRepository.delete(unitType);
+            return true;
+        }
+        catch(DataIntegrityViolationException e){
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException();
+            exc.initCause(e);
+            throw exc;
+        }
     }
 
     @Override

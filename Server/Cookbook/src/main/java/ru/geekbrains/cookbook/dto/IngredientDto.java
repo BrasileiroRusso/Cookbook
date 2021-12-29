@@ -15,19 +15,25 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper=false)
-public class CategoryDto extends RepresentationModel<CategoryDto> {
+public class IngredientDto extends RepresentationModel<IngredientDto> {
     private Long id;
     @NotNull
     @NotEmpty
-    private String title;
+    private String briefName;
+    @NotNull
+    @NotEmpty
+    private String name;
+    @NotNull
+    private Boolean group;
     private Long parentId;
-    private String parentTitle;
-    private Set<SubCategory> subCategories;
+    private String parentBrief;
+    private String imagePath;
+    private Set<SubIngredient> subIngredients;
 
     @Data
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper=false)
-    public static class SubCategory extends RepresentationModel<SubCategory> {
+    public static class SubIngredient extends RepresentationModel<SubIngredient> {
         private Long id;
         private String title;
     }
