@@ -17,11 +17,18 @@ public class RecipeMapper {
         recipeDto.setIngredients(recipe.getIngredients());
         recipeDto.setSteps(MapperUtil.mapToList(recipe.getSteps()));
         recipeDto.setRating(RecipeRatingMapper.recipeRatingToDto(recipe.getRating()));
+        recipeDto.setTags(recipe.getTags());
+        recipeDto.setPrepareTime(recipe.getPrepareTime());
+        recipeDto.setComment(recipe.getComment());
 
         recipeDto.add(linkTo(methodOn(RecipeController.class).getRecipeByID(recipe.getId()))
                 .withSelfRel());
         recipeDto.add(linkTo(methodOn(RecipeController.class).getAllImages(recipe.getId()))
                 .withRel("images"));
+        recipeDto.add(linkTo(methodOn(RecipeController.class).getAllRatings(recipe.getId()))
+                .withRel("ratings"));
+        recipeDto.add(linkTo(methodOn(RecipeController.class).getAllTags(recipe.getId()))
+                .withRel("tags"));
 
         return recipeDto;
     }
@@ -35,6 +42,8 @@ public class RecipeMapper {
         recipe.setUser(recipeDto.getUser());
         recipe.setIngredients(recipeDto.getIngredients());
         recipe.setSteps(MapperUtil.listToMap(recipeDto.getSteps()));
+        recipe.setPrepareTime(recipeDto.getPrepareTime());
+        recipe.setComment(recipeDto.getComment());
 
         return recipe;
     }

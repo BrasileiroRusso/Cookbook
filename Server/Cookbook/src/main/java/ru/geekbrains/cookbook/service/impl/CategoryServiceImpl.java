@@ -6,13 +6,15 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Category;
+import ru.geekbrains.cookbook.dto.CategoryDto;
+import ru.geekbrains.cookbook.dto.CategoryDtoIn;
+import ru.geekbrains.cookbook.mapper.CategoryMapper;
 import ru.geekbrains.cookbook.repository.CategoryRepository;
+import ru.geekbrains.cookbook.repository.specification.CategorySpecification;
 import ru.geekbrains.cookbook.service.CategoryService;
 import ru.geekbrains.cookbook.service.exception.ResourceCannotDeleteException;
 import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service("categoryService")
 @RequiredArgsConstructor
@@ -20,27 +22,42 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    @Transactional
+    public List<CategoryDto> findAll() {
+        return CategoryMapper.categoryListToDtoList(categoryRepository.findAll());
     }
 
     @Override
     @Transactional
-    public Category getCategoryById(Long id)  {
-        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public List<CategoryDto> findAll(Long parentId, Boolean childs) {
+        List<Category> categoryList = categoryRepository.findAll(CategorySpecification.categoryFilter(parentId, childs));
+        return CategoryMapper.categoryListToDtoList(categoryList);
     }
 
     @Override
     @Transactional
-    public Category saveCategory(Category category) {
-        if(category.getId() != null){
-            Optional<Category> optionalCategory = categoryRepository.findById(category.getId());
-            if(!optionalCategory.isPresent())
-                throw new ResourceNotFoundException();
+    public CategoryDto getCategoryById(Long id)  {
+        Category category = findById(id);
+        return CategoryMapper.categoryToDto(category);
+    }
+
+    @Override
+    @Transactional
+    public CategoryDto saveCategory(CategoryDtoIn categoryDto) {
+        Category category;
+        if(categoryDto.getId() != null)
+            category = findById(categoryDto.getId());
+        else
+            category = new Category();
+        category.setTitle(categoryDto.getTitle());
+        if(categoryDto.getParentId() != null){
+            Category parentCategory = findById(categoryDto.getParentId());
+            category.setParentCategory(parentCategory);
         }
-
+        if(categoryDto.getParentId() == null)
+            category.setParentCategory(null);
         category = categoryRepository.save(category);
-        return category;
+        return CategoryMapper.categoryToDto(category);
     }
 
     @Override
@@ -60,6 +77,10 @@ public class CategoryServiceImpl implements CategoryService {
             exc.initCause(e);
             throw exc;
         }
+    }
+
+    private Category findById(Long id){
+        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
 }

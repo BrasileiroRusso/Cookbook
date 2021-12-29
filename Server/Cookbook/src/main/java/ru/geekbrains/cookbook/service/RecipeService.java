@@ -8,7 +8,7 @@ import java.util.*;
 
 public interface RecipeService {
     List<RecipeDto> findAll();
-    Page<RecipeDto> findAll(Pageable pageable, Long categoryId, String titleRegex);
+    Page<RecipeDto> findAll(Pageable pageable, Long categoryId, String titleRegex, Integer prepareTime, List<String> tags, Long authorId);
     RecipeDto getRecipeById(Long id);
     RecipeDto saveRecipe(RecipeDto recipe);
     boolean removeRecipe(Long id);

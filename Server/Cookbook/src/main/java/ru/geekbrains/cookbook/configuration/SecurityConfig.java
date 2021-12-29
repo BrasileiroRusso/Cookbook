@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.geekbrains.cookbook.service.CookbookUserDetailService;
 
 
@@ -20,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CookbookUserDetailService userDetailService;
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -40,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             http.csrf().disable()
                     .antMatcher("/api/**")
                     .authorizeRequests()
-                    .antMatchers("/api/auth").permitAll()
+                    .antMatchers("/api/v1/auth/**").permitAll()
                     .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                     .and()
                     .httpBasic();
@@ -57,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             http.csrf().disable()
                     .antMatcher("/**").authorizeRequests()
                     .antMatchers("/resources/**").permitAll()
+                    .antMatchers("/user/registration/**").permitAll()
                     .antMatchers("/recipes/**").fullyAuthenticated()
                     .and()
                     .formLogin().defaultSuccessUrl("/recipes", true);

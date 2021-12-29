@@ -2,6 +2,7 @@ package ru.geekbrains.cookbook.controller.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,10 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.cookbook.domain.Category;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.geekbrains.cookbook.dto.CategoryDto;
+import ru.geekbrains.cookbook.dto.CategoryDtoIn;
 import ru.geekbrains.cookbook.service.CategoryService;
-
-import java.util.List;
+import java.net.URI;
 
 @RestController
 @AllArgsConstructor
@@ -27,46 +29,48 @@ public class CategoryController {
 
     @Operation(summary = "Возвращает список категорий")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = "200", description = "Операция выполнена успешно",
                     content = { @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = Category.class)))}
+                            array = @ArraySchema(schema = @Schema(implementation = CategoryDto.class)))}
             )}
     )
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<Category> getAllCategories(){
-        return categoryService.findAll();
+    public ResponseEntity<?> getAllCategories(@Parameter(description = "Идентификатор родительской категории", required = false) @RequestParam(value = "parentId", required = false) Long parentId,
+                                              @Parameter(description = "Признак наличия дочерних категорий", required = false) @RequestParam(value = "childs", required = false) Boolean childs){
+        return ResponseEntity.ok(categoryService.findAll(parentId, childs));
     }
 
     @Operation(summary = "Возвращает категорию по идентификатору")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryDto.class))
                     }),
             @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор категории"),
             @ApiResponse(responseCode = "404", description = "Категория не найдена")
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{category_id}")
-    public Category getCategoryByID(@Parameter(description = "Идентификатор категории", required = true) @PathVariable(value="category_id") Long categoryID){
-        return categoryService.getCategoryById(categoryID);
+    public ResponseEntity<?> getCategoryByID(@Parameter(description = "Идентификатор категории", required = true) @PathVariable(value="category_id") Long categoryID){
+        return ResponseEntity.ok(categoryService.getCategoryById(categoryID));
     }
 
     @Operation(summary = "Создает новую категорию", description = "")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Операция выполнена успешно",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))
-                    }),
+            @ApiResponse(responseCode = "200", description = "Операция выполнена успешно", headers = @Header(name = "Location", description = "URI новой категории")),
             @ApiResponse(responseCode = "405", description = "Некорректные входные данные")
     })
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> addCategory(@Parameter(description = "Новая категория", required = true) @RequestBody Category category) {
-        category.setId(null);
-        category = categoryService.saveCategory(category);
-        return ResponseEntity.ok(category);
+    public ResponseEntity<?> addCategory(@Parameter(description = "Новая категория", required = true) @RequestBody CategoryDtoIn categoryDtoIn) {
+        categoryDtoIn.setId(null);
+        CategoryDto category = categoryService.saveCategory(categoryDtoIn);
+        URI newCategoryURI = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{category_id}")
+                .buildAndExpand(category.getId())
+                .toUri();
+        return ResponseEntity.created(newCategoryURI).build();
     }
 
     @Operation(summary = "Обновляет существующую категорию", description = "Обновляет существующую категорию с заданным идентификатором")
@@ -79,8 +83,8 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "/{category_id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateCategory(@Parameter(description = "Идентификатор категории", required = true) @PathVariable(value="category_id") Long categoryId,
-                                            @Parameter(description = "Обновленные параметры категории", required = true) @RequestBody Category category) {
-        categoryService.saveCategory(category);
+                                            @Parameter(description = "Обновленные параметры категории", required = true) @RequestBody CategoryDtoIn categoryDtoIn) {
+        categoryService.saveCategory(categoryDtoIn);
         return ResponseEntity.ok().build();
     }
 

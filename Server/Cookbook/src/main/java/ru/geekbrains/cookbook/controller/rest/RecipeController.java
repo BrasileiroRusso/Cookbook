@@ -10,9 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +28,15 @@ import ru.geekbrains.cookbook.dto.FileLinkDto;
 import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.dto.UploadedFileLinkDto;
 import ru.geekbrains.cookbook.dto.UserRatingDto;
+import ru.geekbrains.cookbook.event.RatingChangedEvent;
+import ru.geekbrains.cookbook.event.RegistrationCompletedEvent;
 import ru.geekbrains.cookbook.service.RatingService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UploadFileService;
-import ru.geekbrains.cookbook.service.UserService;
+import ru.geekbrains.cookbook.service.impl.UserServiceImpl;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +48,8 @@ public class RecipeController {
     private RecipeService recipeService;
     private UploadFileService uploadFileService;
     private RatingService ratingService;
-    private UserService userService;
+    private UserServiceImpl userService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Operation(summary = "Возвращает список рецептов")
     @ApiResponses(value = {
@@ -59,8 +62,11 @@ public class RecipeController {
     @GetMapping
     public Page<RecipeDto> getAllRecipes(@Parameter(description = "Параметры пагинации и сортировки", required = false) Pageable pageable,
                                          @Parameter(description = "Идентификатор категории", required = false) @RequestParam(value = "categoryId", required = false) Long categoryId,
-                                         @Parameter(description = "Фрагмент наименования блюда", required = false) @RequestParam(value = "name", required = false) String name) {
-        Page<RecipeDto> recipePage = recipeService.findAll(pageable, categoryId, name);
+                                         @Parameter(description = "Фрагмент наименования блюда", required = false) @RequestParam(value = "name", required = false) String name,
+                                         @Parameter(description = "Максимальное время приготовления", required = false) @RequestParam(value = "prepareTime", required = false) Integer prepareTime,
+                                         @Parameter(description = "Список тэгов рецепта (через запятую)", required = false) @RequestParam(value = "tags", required = false) List<String> tags,
+                                         @Parameter(description = "Идентификатор автора рецепта", required = false) @RequestParam(value = "author", required = false) Long authorId) {
+        Page<RecipeDto> recipePage = recipeService.findAll(pageable, categoryId, name, prepareTime, tags, authorId);
         recipePage.getContent().forEach(r -> r.setImagePath(FileController.getFileUrl(r.getImagePath())));
         return recipePage;
     }
@@ -257,10 +263,12 @@ public class RecipeController {
     @RequestMapping(path = "/{recipe_id}/rating/{user_id}", method = {RequestMethod.POST, RequestMethod.PUT})
     public ResponseEntity<?> saveRating(@Parameter(description = "Идентификатор рецепта", required = true) @PathVariable(value = "recipe_id") Long recipeId,
                                         @Parameter(description = "Идентификатор пользователя", required = true) @PathVariable(value = "user_id") Long userId,
-                                        @Parameter(description = "Оценка рецепта", required = true) @RequestBody UserRatingDto userRatingDto){
+                                        @Parameter(description = "Оценка рецепта", required = true) @RequestBody @Valid UserRatingDto userRatingDto){
         User user = userService.getUser(userId);
-        ratingService.saveRating(recipeId, user.getId(), userRatingDto.getRate());
-        URI newRatingURI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{user_id}").buildAndExpand(userId).toUri();
+        UserRating rating = ratingService.saveRating(recipeId, user.getId(), userRatingDto.getRate());
+        RatingChangedEvent event = new RatingChangedEvent(rating.getRecipe(), user, rating);
+        eventPublisher.publishEvent(event);
+        URI newRatingURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
         return ResponseEntity.created(newRatingURI).build();
     }
 

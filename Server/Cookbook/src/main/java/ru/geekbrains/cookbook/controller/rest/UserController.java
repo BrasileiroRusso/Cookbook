@@ -16,6 +16,7 @@ import ru.geekbrains.cookbook.auth.User;
 import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.service.UserService;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @AllArgsConstructor
@@ -64,6 +65,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{user_id}/favorite")
     public ResponseEntity<?> getFavoriteRecipes(@Parameter(description = "Идентификатор пользователя", required = true) @PathVariable(value="user_id") Long userId){
+        Set<RecipeDto> favoriteRecipes = userService.getFavoriteRecipes(userId);
+        favoriteRecipes.forEach(r -> r.setImagePath(FileController.getFileUrl(r.getImagePath())));
         return ResponseEntity.ok(userService.getFavoriteRecipes(userId));
     }
 
