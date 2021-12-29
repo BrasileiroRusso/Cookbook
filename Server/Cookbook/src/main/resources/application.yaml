@@ -10,7 +10,7 @@ spring:
     username: postgres
     password: postgres
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format-sql: true
@@ -18,8 +18,8 @@ spring:
     host: smtp.gmail.com
     port: 465
     protocol: smtps
-    username: login@gmail.com
-    password: password
+    username: cookbookjava@gmail.com
+    password: Bernabeu#7
     properties:
       mail:
         transport:
@@ -35,5 +35,12 @@ springdoc:
     path: /api_doc.html
 #   operationsSorter: method
 
-support:
-  email: USERNAME@gmail.com
+ws:
+  app_prefix: /app
+  broker: /cookbook
+  endpoint: /stomp
+  new_recipes: /new
+  ratings: /topic/ratings
+  user_prefix: /users
+
+

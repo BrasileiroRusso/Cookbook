@@ -1,7 +1,7 @@
 package ru.geekbrains.cookbook.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.HashTag;
 import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.RecipeIngredient;
-import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.dto.RecipeDto;
+import ru.geekbrains.cookbook.event.NewRecipeEvent;
 import ru.geekbrains.cookbook.mapper.RecipeMapper;
 import ru.geekbrains.cookbook.repository.RecipeIngredientRepository;
 import ru.geekbrains.cookbook.repository.RecipeRepository;
@@ -19,7 +19,6 @@ import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.TagService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 import ru.geekbrains.cookbook.service.exception.ResourceNotFoundException;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +29,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final UploadFileService uploadFileService;
     private final TagService tagService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -52,15 +52,10 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public RecipeDto getRecipeById(Long id) {
-        Recipe recipe = recipeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public RecipeDto getRecipeById(Long recipeId) {
+        Recipe recipe = findRecipeById(recipeId);
         RecipeDto recipeDto = RecipeMapper.recipeToDto(recipe);
-        String filename = uploadFileService.getUploadedFileListByResource(id, Recipe.class)
-                .getFiles()
-                .stream()
-                .findFirst()
-                .map(LinkedFiles.FileInfo::getFileUri)
-                .orElse("");
+        String filename = uploadFileService.getFirstUploadedFile(recipeId, Recipe.class);
         recipeDto.setImagePath(filename);
         return recipeDto;
     }
@@ -75,7 +70,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         if(recipe.getId() != null){
             recipeId = recipe.getId();
-            newRecipe = recipeRepository.findById(recipe.getId()).orElseThrow(ResourceNotFoundException::new);
+            newRecipe = findRecipeById(recipe.getId());
             newRecipe.setCategory(recipe.getCategory());
             newRecipe.setDescription(recipe.getDescription());
             newRecipe.setTitle(recipe.getTitle());
@@ -113,6 +108,7 @@ public class RecipeServiceImpl implements RecipeService {
                 });
                 recipeIngredientRepository.saveAll(ingredients);
             }
+            eventPublisher.publishEvent(new NewRecipeEvent(newRecipe));
         }
 
         return RecipeMapper.recipeToDto(newRecipe);
@@ -120,29 +116,23 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public boolean removeRecipe(Long id) {
-        try{
-            recipeRepository.deleteById(id);
-            return true;
-        }
-        catch(EmptyResultDataAccessException e){
-            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Category with ID=%d doesn't exist", id));
-            exc.initCause(e);
-            throw exc;
-        }
+    public boolean removeRecipe(Long recipeId) {
+        Recipe recipe = findRecipeById(recipeId);
+        recipeRepository.delete(recipe);
+        return true;
     }
 
     @Override
     @Transactional
     public Set<HashTag> getTagsById(Long recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(ResourceNotFoundException::new);
+        Recipe recipe = findRecipeById(recipeId);
         return recipe.getTags();
     }
 
     @Override
     @Transactional
     public boolean addTagToRecipe(Long recipeId, Long tagId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(ResourceNotFoundException::new);
+        Recipe recipe = findRecipeById(recipeId);
         HashTag tag = tagService.getTagById(tagId);
         recipe.getTags().add(tag);
         recipeRepository.save(recipe);
@@ -152,10 +142,14 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional
     public boolean removeTagFromRecipe(Long recipeId, Long tagId) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(ResourceNotFoundException::new);
+        Recipe recipe = findRecipeById(recipeId);
         HashTag tag = tagService.getTagById(tagId);
         recipe.getTags().remove(tag);
         recipeRepository.save(recipe);
         return true;
+    }
+
+    private Recipe findRecipeById(Long recipeId){
+        return recipeRepository.findById(recipeId).orElseThrow(ResourceNotFoundException::new);
     }
 }

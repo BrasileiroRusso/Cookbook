@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${recipe.id} == null ? 'Добавление рецепта' : 'Редактирование рецепта'">Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link th:href="@{/css/RecipeEdit.css}" type = "text/css" rel="stylesheet">
+<body>
+<div class="container mt-15 mb-15">
+    <div th:replace="~{fragments/header::header}">Header</div>
+
+    <form id="recipe-form" class="my-form" action="edit_recipe" th:object="${recipe}" method="post">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#main">Описание</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#ingredients">Ингредиенты</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#steps">Пошаговая инструкция</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#additional">Дополнительно</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="main">
+                <div id="drop-area">
+                    <p>Изображения блюда</p>
+                    <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+                    <label class="button" for="fileElem">Выбрать изображения</label>
+                    <div id="gallery">
+                        <div class="image" th:each="f, stat : *{images}">
+                            <img src="" th:src="${f.fileUri}" alt="Plate image">
+                            <a class="removeimage" href="#" onclick="removeImage(this)">&#9746;</a>
+                            <input type="hidden" class="recipe_image" th:field="*{images[__${stat.index}__].fileKey}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${recipe.id != null}" class="form-group">
+                    <input type="number" id="recipe_id" th:field="*{id}" hidden>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Название блюда</label>
+                    <input type="text" th:field="*{title}" id="title" class="form-control" required=""/>
+                </div>
+
+                <div class="form-group">
+                    <label for="categories">Категория</label>
+                    <select th:field="*{category.id}" id="categories" class="custom-select">
+                        <option th:each="c : ${categories}" th:value="${c.id}" th:label="${c.title}" th:selected="(*{category.id} eq c.id)">Категория</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Описание рецепта</label>
+                    <input type="text" th:field="*{description}" id="description" class="form-control" required=""/>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="ingredients">
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Ингредиент</th>
+                        <th>Количество ингредиента</th>
+                        <th>Единица измерения</th>
+                        <th>
+                            <button id="add_ingredient" type="button" class="btn btn-primary" onclick="addIngredient()">Добавить</button>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="ingredient-list">
+                    <tr th:each="i, stat : *{ingredients}" class="recipe-ingredient">
+                        <td th:text="${stat.count}" class="ingredient-order">1</td>
+                        <td>
+                            <select th:field="*{ingredients[__${stat.index}__].ingredient.id}" class="ingredient">
+                                <option th:each="ing : ${ingredients}" th:value="${ing.id}" th:label="${ing.briefName}" th:selected="(*{ingredients[__${stat.index}__].ingredient.id} eq ing.id)">Ингредиент</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" th:field="*{ingredients[__${stat.index}__].amount}" class="ingredient-amount" required=""/>
+                        </td>
+                        <td>
+                            <select th:field="*{ingredients[__${stat.index}__].unit.id}" class="ingredient-unit">
+                                <option th:each="u : ${units}" th:value="${u.id}" th:label="${u.briefName}" th:selected="(*{ingredients[__${stat.index}__].unit.id} eq u.id)">Единица измерения</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="button" name="removeIngredient" class="btn btn-primary">Удалить</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="steps">
+                Шаги рецепта...
+            </div>
+            <div class="tab-pane fade" id="additional">
+                Дополнительно...
+            </div>
+        </div>
+
+        <button id="save_recipe" type="button" class="btn btn-primary" onclick="saveRecipe()">Сохранить</button>
+
+    </form>
+
+    <div th:replace="~{fragments/footer::footer}">
+        Footer
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+    $('.content.clossable').hover(function(){
+            $(this).find('.close').animate({opacity:1},100)
+        },function(){
+            $(this).find('.close').animate({opacity:0},100)
+        }
+    )
+</script>
+
+<script>
+    let dropArea = document.getElementById('drop-area')
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false)
+    })
+
+    function preventDefaults (e) {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    function removeImage(closeButton) {
+        closeButton.parentNode.classList.add('removing');
+        setTimeout(()=>closeButton.parentNode.remove(),100);
+    }
+
+    function addIngredient() {
+        var ingredientList = document.querySelector('.ingredient-list');
+        var orderNums = ingredientList.querySelectorAll('.ingredient-order');
+        var maxOrder = 0;
+        for(let i = 0;i < orderNums.length;i++){
+            var curOrder = parseInt(orderNums[i].textContent);
+            if(curOrder > maxOrder)
+                maxOrder = curOrder;
+        }
+        const newItem = document.createElement('tr');
+        newItem.classList.add('recipe-ingredient');
+        const orderTd = document.createElement('td');
+        orderTd.classList.add('ingredient-order');
+        orderTd.textContent = maxOrder + 1;
+        newItem.appendChild(orderTd);
+        ingredientList.appendChild(newItem);
+    }
+
+    function saveRecipe() {
+        var url = document.getElementById('recipe-form').action;
+        var recipe = {};
+        if (document.getElementById('recipe_id')) {
+            recipe.id = parseInt(document.getElementById('recipe_id').value);
+        }
+        recipe.categoryId = parseInt(document.getElementById('categories').value);
+        recipe.title = document.getElementById('title').value;
+        recipe.description = document.getElementById('description').value;
+        recipe.images = [];
+        var imageList = document.querySelectorAll('.recipe_image');
+        for(let i = 0; i < imageList.length; i++){
+            recipe.images.push(imageList[i].value);
+        }
+        recipe.ingredients = [];
+        var ingredientList = document.querySelectorAll('.recipe-ingredient');
+        var recipeIngredient;
+        for(let i = 0; i < ingredientList.length; i++) {
+            recipeIngredient = {};
+            recipeIngredient.ingredientId = ingredientList[i].querySelector('.ingredient').value;
+            recipeIngredient.amount = ingredientList[i].querySelector('.ingredient-amount').value;
+            recipeIngredient.unitId = ingredientList[i].querySelector('.ingredient-unit').value;
+            recipe.ingredients.push(recipeIngredient);
+        }
+
+        const recipeJSON = JSON.stringify(recipe);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, false);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(recipeJSON);
+        if(xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201)){
+            var url = document.getElementById('main-ref').href;
+            window.location.assign(url);
+        }
+    }
+
+    ;['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false)
+    })
+    ;['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false)
+    })
+
+    function highlight(e) {
+        dropArea.classList.add('highlight')
+    }
+    function unhighlight(e) {
+        dropArea.classList.remove('highlight')
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false)
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer
+        let files = dt.files
+        handleFiles(files)
+    }
+
+    function handleFiles(files) {
+        files = [...files]
+        files.forEach(handleFile)
+    }
+
+    function handleFile(file) {
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onloadend = function() {
+            const item = document.createElement('div');
+            item.classList.add('image');
+            // Картинка для предпросмотра
+            const image = new Image;
+            // URI картинки
+            image.src = reader.result;
+            // Ссылка на исключение картинки из списка выгрузки
+            const remove = document.createElement('a');
+            remove.classList.add('removeimage');
+            remove.innerHTML = '&#9746;';
+            remove.href="#";
+            // Обработчик клика по ссылке исключения картинки
+            remove.addEventListener('click',()=>{
+                // Исключаем элемент с картинкой из списка выгрузки
+                item.classList.add('removing');
+                setTimeout(()=>item.remove(),100);
+            });
+            item.appendChild(image);
+            item.appendChild(remove);
+            document.getElementById('gallery').appendChild(item)
+            uploadFile(file, item)
+        }
+    }
+
+    function uploadFile(file, item) {
+        var url = '../../file/upload';
+        var xhr = new XMLHttpRequest();
+        var formData = new FormData();
+        xhr.open('POST', url, true);
+        xhr.addEventListener('readystatechange', function(e) {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                const uploadFile = JSON.parse(xhr.responseText);
+                const fileKey = uploadFile.filename;
+                const fileInput = document.createElement('input');
+                fileInput.setAttribute('type', 'hidden');
+                fileInput.classList.add('recipe_image');
+                fileInput.value = fileKey;
+                item.appendChild(fileInput);
+            }
+            else if (xhr.readyState == 4 && xhr.status != 200) {
+                // Ошибка. Информируем пользователя
+            }
+        });
+        formData.append('file', file);
+        xhr.send(formData);
+    }
+
+</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+
+</script>
+
+</body>
+</html>
