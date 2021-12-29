@@ -16,15 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.geekbrains.cookbook.domain.Ingredient;
+import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
 import ru.geekbrains.cookbook.dto.FileLinkDto;
-import ru.geekbrains.cookbook.dto.IngredientDto;
 import ru.geekbrains.cookbook.dto.UploadedFileLinkDto;
 import ru.geekbrains.cookbook.service.IngredientService;
 import ru.geekbrains.cookbook.service.UploadFileService;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -40,47 +39,44 @@ public class IngredientController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     content = { @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = IngredientDto.class)))}
+                            array = @ArraySchema(schema = @Schema(implementation = Ingredient.class)))}
             )}
     )
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ResponseEntity<?> getAllIngredients(){
-        List<IngredientDto> ingredientList = ingredientService.findAll();
-        return ResponseEntity.ok(ingredientList);
+    public List<Ingredient> getAllIngredients(){
+        return ingredientService.findAll();
     }
 
     @Operation(summary = "Возвращает категорию по идентификатору")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = IngredientDto.class))
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = Ingredient.class))
                     }),
             @ApiResponse(responseCode = "400", description = "Указан некорректный идентификатор"),
             @ApiResponse(responseCode = "404", description = "Ингредиент не найден")
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{ingredient_id}")
-    public ResponseEntity<?> getIngredientByID(@Parameter(description = "Идентификатор ингредиента", required = true) @PathVariable(value="ingredient_id") Long ingredientID){
-        IngredientDto ingredient = ingredientService.getIngredientById(ingredientID);
-        return ResponseEntity.ok(ingredient);
+    public Ingredient getIngredientByID(@Parameter(description = "Идентификатор ингредиента", required = true) @PathVariable(value="ingredient_id") Long ingredientID){
+        return ingredientService.getIngredientById(ingredientID);
     }
 
     @Operation(summary = "Создает новый ингредиент", description = "")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Операция выполнена успешно", headers = @Header(name = "Location", description = "URI нового ингредиента")),
+            @ApiResponse(responseCode = "200", description = "Операция выполнена успешно",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = Ingredient.class))
+                    }),
             @ApiResponse(responseCode = "405", description = "Некорректные входные данные")
     })
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    public ResponseEntity<?> addIngredient(@Parameter(description = "Новый ингредиент", required = true) @RequestBody @Valid IngredientDto ingredientDto) {
-        ingredientDto.setId(null);
-        ingredientDto = ingredientService.saveIngredient(ingredientDto);
-        URI newIngredientURI = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{ingredient_id}")
-                .buildAndExpand(ingredientDto.getId())
-                .toUri();
-        return ResponseEntity.created(newIngredientURI).build();
+    public ResponseEntity<?> addIngredient(@Parameter(description = "Новый ингредиент", required = true) @RequestBody Ingredient ingredient) {
+        ingredient.setId(null);
+        ingredient = ingredientService.saveIngredient(ingredient);
+        return ResponseEntity.ok(ingredient);
     }
 
     @Operation(summary = "Обновляет существующий ингредиент", description = "Обновляет существующий ингредиент с заданным идентификатором")
@@ -93,9 +89,8 @@ public class IngredientController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "/{ingredient_id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateIngredient(@Parameter(description = "Идентификатор ингредиента", required = true) @PathVariable(value="ingredient_id") Long ingredientId,
-                                              @Parameter(description = "Обновленные параметры ингредиента", required = true) @RequestBody @Valid IngredientDto ingredientDto) {
-        ingredientDto.setId(ingredientId);
-        ingredientDto = ingredientService.saveIngredient(ingredientDto);
+                                              @Parameter(description = "Обновленные параметры ингредиента", required = true) @RequestBody Ingredient ingredient) {
+        ingredient = ingredientService.saveIngredient(ingredient);
         return ResponseEntity.ok().build();
     }
 

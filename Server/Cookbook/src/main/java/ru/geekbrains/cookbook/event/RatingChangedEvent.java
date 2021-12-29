@@ -2,23 +2,22 @@ package ru.geekbrains.cookbook.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
+import ru.geekbrains.cookbook.auth.User;
+import ru.geekbrains.cookbook.domain.Recipe;
 import ru.geekbrains.cookbook.domain.UserRating;
 
 public class RatingChangedEvent extends ApplicationEvent {
     @Getter
-    private final String recipeTitle;
+    private final Recipe recipe;
     @Getter
-    private final String username;
-    @Getter
-    private final String email;
+    private final User user;
     @Getter
     private final UserRating rating;
 
-    public RatingChangedEvent(UserRating rating, String recipeTitle, String username, String email) {
-        super(rating);
-        this.recipeTitle = recipeTitle;
-        this.username = username;
-        this.email = email;
+    public RatingChangedEvent(Recipe recipe, User user, UserRating rating) {
+        super(user);
+        this.recipe = recipe;
+        this.user = user;
         this.rating = rating;
     }
 

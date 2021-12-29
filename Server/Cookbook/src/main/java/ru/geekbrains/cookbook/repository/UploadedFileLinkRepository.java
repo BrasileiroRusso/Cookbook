@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface UploadedFileLinkRepository extends JpaRepository<UploadedFileLink, Long> {
     List<UploadedFileLink> findAllByObjectIdAndObjectType(Long objectId, String objectType);
     List<UploadedFileLink> findAllByObjectIdInAndObjectTypeAndObjectPart(List<Long> ids, String objectType, String objectPart);
-    List<UploadedFileLink> findAllByObjectTypeAndObjectPart(String objectType, String objectPart);
     Optional<UploadedFileLink> findByObjectIdAndObjectTypeAndObjectPartAndUploadedFile_Filename(Long objectId, String objectType, String objectPart, String filekey);
 }

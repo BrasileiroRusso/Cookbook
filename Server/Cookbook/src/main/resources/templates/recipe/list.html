@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Cookbook</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <body>
 <div class="container mt-15 mb-15">
     <div th:replace="~{fragments/header::header}">Header</div>
@@ -37,15 +37,11 @@
                 <p th:text="${recipe.description}" class="card-text">Plate description</p>
 
                 <div class="justify-content">
-                    <a th:href="@{/recipes/edit_recipe(recipe_id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
+                    <a th:href="@{/recipes/add_recipe(recipe_id=${recipe.id})}" href="#" class="btn btn-primary">Редактировать</a>
                     <a th:href="@{/recipes/remove(recipe_id=${recipe.id})}" href="#" class="btn btn-danger">Удалить</a>
                 </div>
 
             </div>
-        </div>
-    </div>
-    <div class="panel-body">
-        <div id="messages">
         </div>
     </div>
 
@@ -54,29 +50,5 @@
     </div>
 </div>
 
-<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
-<script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
-<script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
-<script src="/webjars/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script th:inline="javascript">
-
-    $(function() {
-        var stompClient = null;
-        var url = [[${#httpServletRequest.requestURL}]];
-        const regex = /recipes/;
-        let stompUrl = url.replace(regex, 'stomp');
-        var socket = new SockJS(stompUrl);
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, function(frame) {
-            stompClient.subscribe('/cookbook/new', function (data) {
-                var recipe = JSON.parse(data.body);
-                var result = '<span>New recipe ' + recipe.title + '</span><br/>';
-                $('#messages').append(result);
-            });
-        });
-    });
-
-</script>
 </body>
 </html>

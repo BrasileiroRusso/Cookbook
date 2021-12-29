@@ -2,10 +2,12 @@ package ru.geekbrains.cookbook.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.cookbook.domain.Category;
 import ru.geekbrains.cookbook.dto.CategoryDto;
+import ru.geekbrains.cookbook.dto.CategoryDtoIn;
 import ru.geekbrains.cookbook.mapper.CategoryMapper;
 import ru.geekbrains.cookbook.repository.CategoryRepository;
 import ru.geekbrains.cookbook.repository.specification.CategorySpecification;
@@ -41,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto saveCategory(CategoryDto categoryDto) {
+    public CategoryDto saveCategory(CategoryDtoIn categoryDto) {
         Category category;
         if(categoryDto.getId() != null)
             category = findById(categoryDto.getId());
@@ -62,12 +64,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public boolean removeCategory(Long id) {
         try{
-            Category category = findById(id);
-            categoryRepository.delete(category);
+            categoryRepository.deleteById(id);
             return true;
         }
+        catch(EmptyResultDataAccessException e){
+            ResourceNotFoundException exc = new ResourceNotFoundException(String.format("Category with ID=%d doesn't exist", id));
+            exc.initCause(e);
+            throw exc;
+        }
         catch(DataIntegrityViolationException e){
-            ResourceCannotDeleteException exc = new ResourceCannotDeleteException();
+            ResourceCannotDeleteException exc = new ResourceCannotDeleteException(String.format("Cannot remove the category with ID=%d cause it has linked recipes", id));
             exc.initCause(e);
             throw exc;
         }

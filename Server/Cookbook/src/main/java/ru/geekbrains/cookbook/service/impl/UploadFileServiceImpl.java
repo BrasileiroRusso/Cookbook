@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.geekbrains.cookbook.auth.User;
-import ru.geekbrains.cookbook.domain.Ingredient;
 import ru.geekbrains.cookbook.domain.file.LinkedFiles;
 import ru.geekbrains.cookbook.domain.file.UploadedFile;
 import ru.geekbrains.cookbook.domain.file.UploadedFileLink;
@@ -99,32 +98,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Transactional
     public Map<Long, String> getUploadedFilesByObjectList(List<Long> ids, Class<?> objectType) {
         List<UploadedFileLink> fileList = uploadedFileLinkRepository.findAllByObjectIdInAndObjectTypeAndObjectPart(ids, objectType.getSimpleName(), "");
-        return fileLinkListToMap(fileList);
-    }
-
-    @Override
-    @Transactional
-    public Map<Long, String> getUploadedFilesByObjectType(Class<?> objectType) {
-        List<UploadedFileLink> fileList = uploadedFileLinkRepository.findAllByObjectTypeAndObjectPart(objectType.getSimpleName(), "");
-        return fileLinkListToMap(fileList);
-    }
-
-    @Override
-    @Transactional
-    public String getFirstUploadedFile(Long objectId, Class<?> objectType) {
-        return getUploadedFileListByResource(objectId, objectType)
-                .getFiles()
-                .stream()
-                .findFirst()
-                .map(LinkedFiles.FileInfo::getFileUri)
-                .orElse("");
-    }
-
-    private Map<Long, String> fileLinkListToMap(List<UploadedFileLink> fileLinkList){
-        if(fileLinkList == null)
-            return null;
-        return fileLinkList
-                .stream()
+        return fileList.stream()
                 .collect(Collectors.toMap(
                         UploadedFileLink::getObjectId,
                         fileLink -> fileLink.getUploadedFile().getFilename(),

@@ -1,12 +1,12 @@
 package ru.geekbrains.cookbook.service;
 
-import ru.geekbrains.cookbook.dto.IngredientDto;
+import ru.geekbrains.cookbook.domain.Ingredient;
 import java.util.List;
 
 public interface IngredientService {
-    List<IngredientDto> findAll();
-    IngredientDto getIngredientById(Long id);
-    IngredientDto saveIngredient(IngredientDto ingredient);
+    List<Ingredient> findAll();
+    Ingredient getIngredientById(Long id);
+    Ingredient saveIngredient(Ingredient ingredient);
     boolean removeIngredient(Long id);
 }
 

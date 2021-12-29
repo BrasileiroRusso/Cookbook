@@ -16,9 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.geekbrains.cookbook.dto.CategoryDto;
+import ru.geekbrains.cookbook.dto.CategoryDtoIn;
 import ru.geekbrains.cookbook.service.CategoryService;
-
-import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -64,9 +63,9 @@ public class CategoryController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> addCategory(@Parameter(description = "Новая категория", required = true) @RequestBody @Valid CategoryDto categoryDto) {
-        categoryDto.setId(null);
-        CategoryDto category = categoryService.saveCategory(categoryDto);
+    public ResponseEntity<?> addCategory(@Parameter(description = "Новая категория", required = true) @RequestBody CategoryDtoIn categoryDtoIn) {
+        categoryDtoIn.setId(null);
+        CategoryDto category = categoryService.saveCategory(categoryDtoIn);
         URI newCategoryURI = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{category_id}")
                 .buildAndExpand(category.getId())
@@ -84,8 +83,8 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "/{category_id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateCategory(@Parameter(description = "Идентификатор категории", required = true) @PathVariable(value="category_id") Long categoryId,
-                                            @Parameter(description = "Обновленные параметры категории", required = true) @RequestBody @Valid CategoryDto categoryDto) {
-        categoryService.saveCategory(categoryDto);
+                                            @Parameter(description = "Обновленные параметры категории", required = true) @RequestBody CategoryDtoIn categoryDtoIn) {
+        categoryService.saveCategory(categoryDtoIn);
         return ResponseEntity.ok().build();
     }
 

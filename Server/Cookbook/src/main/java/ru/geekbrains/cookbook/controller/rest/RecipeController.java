@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,8 @@ import ru.geekbrains.cookbook.dto.FileLinkDto;
 import ru.geekbrains.cookbook.dto.RecipeDto;
 import ru.geekbrains.cookbook.dto.UploadedFileLinkDto;
 import ru.geekbrains.cookbook.dto.UserRatingDto;
+import ru.geekbrains.cookbook.event.RatingChangedEvent;
+import ru.geekbrains.cookbook.event.RegistrationCompletedEvent;
 import ru.geekbrains.cookbook.service.RatingService;
 import ru.geekbrains.cookbook.service.RecipeService;
 import ru.geekbrains.cookbook.service.UploadFileService;
@@ -46,6 +49,7 @@ public class RecipeController {
     private UploadFileService uploadFileService;
     private RatingService ratingService;
     private UserServiceImpl userService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Operation(summary = "Возвращает список рецептов")
     @ApiResponses(value = {
@@ -262,6 +266,8 @@ public class RecipeController {
                                         @Parameter(description = "Оценка рецепта", required = true) @RequestBody @Valid UserRatingDto userRatingDto){
         User user = userService.getUser(userId);
         UserRating rating = ratingService.saveRating(recipeId, user.getId(), userRatingDto.getRate());
+        RatingChangedEvent event = new RatingChangedEvent(rating.getRecipe(), user, rating);
+        eventPublisher.publishEvent(event);
         URI newRatingURI = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
         return ResponseEntity.created(newRatingURI).build();
     }
