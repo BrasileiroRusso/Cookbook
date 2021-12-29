@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.geekbrains.cookbook.dto.UnitDto;
 import ru.geekbrains.cookbook.service.UnitService;
+
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -61,7 +63,7 @@ public class UnitController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> addUnit(@Parameter(description = "Новая единица измерения", required = true) @RequestBody UnitDto unitDto) {
+    public ResponseEntity<?> addUnit(@Parameter(description = "Новая единица измерения", required = true) @RequestBody @Valid UnitDto unitDto) {
         unitDto.setId(null);
         unitDto = unitService.saveUnit(unitDto);
         URI newUnitURI = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -81,7 +83,7 @@ public class UnitController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "/{unit_id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateUnit(@Parameter(description = "Идентификатор единицы измерения", required = true) @PathVariable(value="unit_id") Long unitId,
-                                        @Parameter(description = "Обновленные параметры единицы измерения", required = true) @RequestBody UnitDto unitDto) {
+                                        @Parameter(description = "Обновленные параметры единицы измерения", required = true) @RequestBody @Valid UnitDto unitDto) {
         unitDto.setId(unitId);
         unitDto = unitService.saveUnit(unitDto);
         return ResponseEntity.ok().build();

@@ -15,10 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.geekbrains.cookbook.dto.UnitDto;
 import ru.geekbrains.cookbook.dto.UnitTypeDto;
 import ru.geekbrains.cookbook.service.UnitService;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -61,7 +61,7 @@ public class UnitTypeController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<?> addUnitType(@Parameter(description = "Новый тип единицы измерения", required = true) @RequestBody UnitTypeDto unitTypeDto) {
+    public ResponseEntity<?> addUnitType(@Parameter(description = "Новый тип единицы измерения", required = true) @RequestBody @Valid UnitTypeDto unitTypeDto) {
         unitTypeDto.setId(null);
         unitTypeDto = unitService.saveUnitType(unitTypeDto);
         URI newURI = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -81,7 +81,7 @@ public class UnitTypeController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "/{unit_type_id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateUnit(@Parameter(description = "Идентификатор единицы измерения", required = true) @PathVariable(value="unit_type_id") Long unitTypeId,
-                                        @Parameter(description = "Обновленные параметры типа единиц измерения", required = true) @RequestBody UnitTypeDto unitTypeDto) {
+                                        @Parameter(description = "Обновленные параметры типа единиц измерения", required = true) @RequestBody @Valid UnitTypeDto unitTypeDto) {
         unitTypeDto.setId(unitTypeId);
         unitTypeDto = unitService.saveUnitType(unitTypeDto);
         return ResponseEntity.ok().build();
